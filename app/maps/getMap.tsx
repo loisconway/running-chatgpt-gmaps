@@ -27,9 +27,10 @@ import {
   } from '@vis.gl/react-google-maps';
   import {MarkerClusterer} from '@googlemaps/markerclusterer';
   import type {Marker} from '@googlemaps/markerclusterer';
-import { LatLng } from 'react-native-maps';
+import { REACT_APP_MAP_ID } from '@/environmentVariables';
 
-const mapId = process.env.REACT_APP_MAP_ID
+
+const mapId = REACT_APP_MAP_ID
 
 type Poi ={ key: string, location: google.maps.LatLngLiteral }
 const locations: Poi[] = [

@@ -3,9 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import {MapForUI} from '../maps/getMap';
-
-
-const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY|| "key"
+import { REACT_APP_GOOGLE_MAPS_API_KEY } from '@/environmentVariables';
 
 
 interface Coordinates {
@@ -16,6 +14,8 @@ interface Coordinates {
 const HomeScreen: React.FC = () => {
   const [inputText, setInputText] = useState<string>('');
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+
+  const apiKey = REACT_APP_GOOGLE_MAPS_API_KEY
 
   // Function to fetch route coordinates using the input text
   const fetchRouteCoordinates = async (): Promise<void> => {
@@ -55,7 +55,7 @@ const HomeScreen: React.FC = () => {
       };
 
   return (
-    <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API has loaded.')}>
+    <APIProvider apiKey={apiKey!} onLoad={() => console.log('Maps API has loaded.')}>
     <View style={styles.container}>
       <TextInput
         style={styles.input}
