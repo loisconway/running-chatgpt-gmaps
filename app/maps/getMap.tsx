@@ -29,6 +29,8 @@ import {
   import type {Marker} from '@googlemaps/markerclusterer';
 import { LatLng } from 'react-native-maps';
 
+const mapId = process.env.REACT_APP_MAP_ID
+
 type Poi ={ key: string, location: google.maps.LatLngLiteral }
 const locations: Poi[] = [
   {key: 'operaHouse', location: { lat: -33.8567844, lng: 151.213108  }},
@@ -49,7 +51,7 @@ const locations: Poi[] = [
 ];
 export const MapForUI = () => (
    <Map
-   mapId = 'dd1b3dfd3ec336cf'
+   mapId = {mapId}
       defaultZoom={13}
       defaultCenter={ { lat: -33.860664, lng: 151.208138 } }
       onCameraChanged={ (ev: MapCameraChangedEvent) =>
