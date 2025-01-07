@@ -4,6 +4,10 @@ import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import {MapForUI} from '../maps/getMap';
 
+
+const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY|| "key"
+
+
 interface Coordinates {
   latitude: number;
   longitude: number;
@@ -51,7 +55,7 @@ const HomeScreen: React.FC = () => {
       };
 
   return (
-    <APIProvider apiKey={'AIzaSyB9L1lzeU88_AysanLiTNT8-47xqzbfCdo'} onLoad={() => console.log('Maps API has loaded.')}>
+    <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API has loaded.')}>
     <View style={styles.container}>
       <TextInput
         style={styles.input}
