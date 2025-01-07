@@ -1,6 +1,8 @@
+import { APIProvider } from '@vis.gl/react-google-maps';
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
+import {MapForUI} from '../maps/getMap';
 
 interface Coordinates {
   latitude: number;
@@ -49,6 +51,7 @@ const HomeScreen: React.FC = () => {
       };
 
   return (
+    <APIProvider apiKey={'AIzaSyB9L1lzeU88_AysanLiTNT8-47xqzbfCdo'} onLoad={() => console.log('Maps API has loaded.')}>
     <View style={styles.container}>
       <TextInput
         style={styles.input}
@@ -60,7 +63,7 @@ const HomeScreen: React.FC = () => {
       <View style={styles.mapContainer}>
         {coordinates ? (
 
-          <>This is the map!</>
+          <MapForUI/>
           // <MapView style={styles.map} region={initialRegion}>
           //   <Marker coordinate={coordinates} title="Selected Location" />
           // </MapView>
@@ -71,6 +74,7 @@ const HomeScreen: React.FC = () => {
         )}
       </View>
     </View>
+    </APIProvider>
   );
 };
 
