@@ -144,7 +144,6 @@ backgroundColor: "red",
     fontWeight: "600",
     fontSize: 13,
   },
-
   textInput: {
     height: 40,
     borderRadius: 8,
@@ -154,7 +153,6 @@ backgroundColor: "red",
     borderWidth: 1,
     borderColor: "#ddd",
   },
-
   description: {
     fontSize: 13,
   },
