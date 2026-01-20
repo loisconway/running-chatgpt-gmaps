@@ -1,3 +1,18 @@
+## Woops I broke this app
+Had some issues with gmaps api, was playing about with a few things and the app is in a bit of a broken state, but the working branch where most of the changes I have is feature/google-maps-2 so have a look at that to see what I have been trying lol
+
+I think the gmaps api updated and I lost some features, I also have an issue with trying to import react-native internals not supported on web. I need to make sure to separate concerns if I have web vs mobile.
+
+Visuals still run on mobile and I can open some of my saved routes but I cant add new routes due to the searching and GooglePlacesAutocomplete not working anymore, need to look into this. But I was more focused on getting it working on IOS so I think this is a lower priority for me.
+
+Gmaps issue I think is that there is a new places API and I need to set it up in my google dev account.
+
+# To Do
+- Fix or remove GooglePlacesAutocomplete 
+- Add the ability to add places by touching the map instead 
+- Add a simple AI implementation simply looks for start and end points in a NL user input and transforms these to maps
+- Look at different mapping options, the gmaps api is a bit tricky
+
 # Route planning using AI
 ## The Plan
 The plan for this application (eventually) is for a user to be able to define the route they want to run in natural language and have a running route be created. 
@@ -13,6 +28,7 @@ The app would then use AI to generate plot points for a map and generate the rou
 ## To-Do
 - AI implementation 
 - How I plan to match up AI to maps 
+# Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 

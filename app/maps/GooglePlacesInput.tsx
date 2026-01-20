@@ -33,7 +33,12 @@ const GooglePlacesInput: React.FC<GooglePlacesProps> = ({
       <GooglePlacesAutocomplete
         keyboardShouldPersistTaps="handled"
         listViewDisplayed="auto"
-        predefinedPlaces={[]}
+        predefinedPlaces={[
+  {
+    description: "London",
+    geometry: { location: { lat: 51.5074, lng: -0.1278 } },
+  },
+]}
         textInputProps={{ autoFocus: false }}
         placeholder={placeholder}
         fetchDetails={true}
@@ -47,6 +52,10 @@ const GooglePlacesInput: React.FC<GooglePlacesProps> = ({
           separator: styles.separator,
         }}
         onPress={(data, details = null) => {
+       
+  console.log("PLACE:", data.description);
+  console.log("DETAILS:", details);
+
           console.log(data, details);
           setLocation({
             name: data.description,
@@ -59,6 +68,8 @@ const GooglePlacesInput: React.FC<GooglePlacesProps> = ({
           key: apiKey,
           language: "en",
         }}
+        onFail={(error) => console.log("Google Places error:", error)}
+      
       />
     </View>
   );
@@ -66,18 +77,30 @@ const GooglePlacesInput: React.FC<GooglePlacesProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 1,
-  },
+  marginBottom: 1,
+  zIndex: 10,
+},
+inputContainer: {
+  flex: 0,
+  width: "100%",
+  zIndex: 10,
+},
+listView: {
+  position: "absolute",
+  top: 45,
+  zIndex: 20,
+  elevation: 20,
+backgroundColor: "red",
+  borderRadius: 8,
+},
+
+
   label: {
     marginBottom: 4,
     fontWeight: "600",
     fontSize: 13,
   },
-  inputContainer: {
-    flex: 0,
-    width: "100%",
-    zIndex: 1,
-  },
+
   textInput: {
     height: 40,
     borderRadius: 8,
@@ -87,16 +110,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
   },
-  listView: {
-    borderRadius: 8,
-    backgroundColor: "#fff",
-    marginTop: 5,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
+
   description: {
     fontSize: 13,
   },

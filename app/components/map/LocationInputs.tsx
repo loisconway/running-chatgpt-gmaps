@@ -79,7 +79,6 @@ const LocationInputs: React.FC<LocationInputsProps> = ({
 const styles = StyleSheet.create({
   inputsSection: {
     marginBottom: 8,
-    maxHeight: 280,
   },
   titleContainer: {
     alignItems: "center",
