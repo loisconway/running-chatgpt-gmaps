@@ -95,6 +95,7 @@
 //       const CONFIGURATION = {
 //         "ctaTitle": "Checkout",
 //         "mapOptions": {"center":{"lat":37.4221,"lng":-122.0841},"fullscreenControl":true,"mapTypeControl":false,"streetViewControl":true,"zoom":11,"zoomControl":true,"maxZoom":22,"mapId":""},
+//         "mapsApiKey": "AIzaSyB9L1lzeU88_AysanLiTNT8-47xqzbfCdo",
 //         "capabilities": {"addressAutocompleteControl":true,"mapDisplayControl":true,"ctaControl":true}
 //       };
 

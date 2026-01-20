@@ -5,7 +5,7 @@ module.exports = (api) => {
     presets: ["babel-preset-expo"],
     plugins: [
       // Support for react-native-reanimated
-      "react-native-reanimated/plugin",
+      // "react-native-reanimated/plugin",
 
       // Module resolver for path aliases
       [

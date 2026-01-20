@@ -43,18 +43,19 @@ export default {
       favicon: "./assets/favicon.png",
       bundler: "metro",
     },
-    plugins: [
-      [
-        "expo-font",
-        "expo-router",
-        "expo-web-browser",
-        "expo-location",
-        {
-          locationAlwaysAndWhenInUsePermission:
-            "Allow this app to use your location to show walking routes near you.",
-        },
-      ],
-    ],
+plugins: [
+  "expo-font",
+  "expo-router",
+  "expo-web-browser",
+  [
+    "expo-location",
+    {
+      locationAlwaysAndWhenInUsePermission:
+        "Allow this app to use your location to show walking routes near you.",
+    },
+  ],
+],
+
     extra: {
       eas: {
         projectId: "your-project-id",
