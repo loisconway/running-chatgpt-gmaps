@@ -6,6 +6,7 @@ The app would then use AI to generate plot points for a map and generate the rou
 
 ## Currently
 - Render a route between two points
+<<<<<<< HEAD
 - Save and reload routes (up to 5 can be saved)
 - Add start and end by clicking on the map
 - Start/end lat/long transformed into addresses using reverse geocoding
@@ -30,6 +31,15 @@ I think the gmaps api updated and I lost some features: autocomplete stopped wor
 
 
 # Welcome to your Expo app 👋
+=======
+- Save and reload routes 
+- Autocomplete when searching locations 
+- Google maps API (I might've broken this)
+
+## To-Do
+- AI implementation 
+- How I plan to match up AI to maps 
+>>>>>>> c70393e (Trying to fix things)
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
