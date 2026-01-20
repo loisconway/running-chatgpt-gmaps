@@ -1,4 +1,21 @@
-# Welcome to your Expo app 👋
+## Woops I broke this app
+Had some issues with gmaps api, was playing about with a few things and the app is in a bit of a broken state, but the working branch where most of the changes I have is feature/google-maps-2 so have a look at that to see what I have been trying lol
+
+# Route planning using AI
+## The Plan
+The plan for this application (eventually) is for a user to be able to define the route they want to run in natural language and have a running route be created. 
+For example: 'I want to run 10km starting in Greenwich and ending in whitechapel, and where possible I want to go into parks' 
+The app would then use AI to generate plot points for a map and generate the route. 
+
+## Currently
+- Render a route between two points
+- Save and reload routes 
+- Autocomplete when searching locations 
+- Google maps API (I might've broken this)
+
+## To-Do
+- AI implementation 
+- How I plan to match up AI to maps 
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
