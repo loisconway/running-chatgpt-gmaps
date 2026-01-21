@@ -1,5 +1,7 @@
 import type React from "react";
+import { useEffect, useRef } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import type { GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import { REACT_APP_GOOGLE_MAPS_API_KEY } from "@/environmentVariables";
 import { View, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
@@ -26,6 +28,14 @@ const GooglePlacesInput: React.FC<GooglePlacesProps> = ({
   placeholder,
   label,
 }) => {
+  const ref = useRef<GooglePlacesAutocompleteRef>(null);
+
+  // Update the text input when location changes
+  useEffect(() => {
+    if (location?.name && ref.current) {
+      ref.current.setAddressText(location.name);
+    }
+  }, [location?.name]);
   return (
     <View style={styles.container}>
       {/* <ThemedText>{location?.name}</ThemedText> */}
@@ -33,12 +43,41 @@ const GooglePlacesInput: React.FC<GooglePlacesProps> = ({
       <GooglePlacesAutocomplete
         keyboardShouldPersistTaps="handled"
         listViewDisplayed="auto"
-        predefinedPlaces={[
-  {
-    description: "London",
-    geometry: { location: { lat: 51.5074, lng: -0.1278 } },
-  },
-]}
+//         predefinedPlaces={[
+//   {
+//     description: "Hyde Park, London, UK",
+//     geometry: { location: { lat: 51.5074, lng: -0.1657 } },
+//     place_id: "ChIJdd4hrwug2EcRmSrV3Vo6llI",
+//   } as any,
+//   {
+//     description: "Tower Bridge, London, UK",
+//     geometry: { location: { lat: 51.5055, lng: -0.0754 } },
+//     place_id: "ChIJ54K66WgDdkgRRWTUf8VKKFQ",
+//   } as any,
+//   {
+//     description: "Regent's Park, London, UK",
+//     geometry: { location: { lat: 51.5313, lng: -0.1573 } },
+//     place_id: "ChIJdd3OT0ocdkgRnEqBdOFxDM0",
+//   } as any,
+//   {
+//     description: "Greenwich Park, London, UK",
+//     geometry: { location: { lat: 51.4769, lng: -0.0005 } },
+//     place_id: "ChIJC7buBO2e2EcR-VmTgKxYNxo",
+//   } as any,
+//   {
+//     description: "Buckingham Palace, London, UK",
+//     geometry: { location: { lat: 51.5014, lng: -0.1419 } },
+//     place_id: "ChIJtV5bzSAFdkgRpwLZFPWrJgo",
+//   } as any,
+//   {
+//     description: "The Serpentine, Hyde Park, London, UK",
+//     geometry: { location: { lat: 51.5048, lng: -0.1666 } },
+//     place_id: "ChIJNRBlR_IEdkgRUYnbyWn1VGo",
+//   } as any,
+// ]}
+
+      predefinedPlaces={[]}
+        ref={ref}
         textInputProps={{ autoFocus: false }}
         placeholder={placeholder}
         fetchDetails={true}
@@ -52,16 +91,21 @@ const GooglePlacesInput: React.FC<GooglePlacesProps> = ({
           separator: styles.separator,
         }}
         onPress={(data, details = null) => {
-       
-  console.log("PLACE:", data.description);
-  console.log("DETAILS:", details);
+          // For predefined places, geometry is in data, not details
+          const lat =
+            details?.geometry?.location?.lat ||
+            (data as any)?.geometry?.location?.lat ||
+            0;
+          const lng =
+            details?.geometry?.location?.lng ||
+            (data as any)?.geometry?.location?.lng ||
+            0;
 
-          console.log(data, details);
           setLocation({
             name: data.description,
-            placeId: data.place_id,
-            latitude: details?.geometry?.location?.lat || 0,
-            longitude: details?.geometry?.location?.lng || 0,
+            placeId: (data as any).place_id || data.description,
+            latitude: lat,
+            longitude: lng,
           });
         }}
         query={{

@@ -1,6 +1,7 @@
 import type React from "react";
 import { View, StyleSheet } from "react-native";
 import { TouchableOpacity, ActivityIndicator } from "react-native";
+import { MapPin } from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
 
 import type { LocationType } from "../../hooks/useLocation";
@@ -14,6 +15,9 @@ interface LocationInputsProps {
   onGetDirections: () => void;
   onReset: () => void;
   loading: boolean;
+  onMapTapOrigin?: () => void;
+  onMapTapDestination?: () => void;
+  mapTapMode?: "origin" | "destination" | null;
 }
 
 const LocationInputs: React.FC<LocationInputsProps> = ({
@@ -24,6 +28,9 @@ const LocationInputs: React.FC<LocationInputsProps> = ({
   onGetDirections,
   onReset,
   loading,
+  onMapTapOrigin,
+  onMapTapDestination,
+  mapTapMode,
 }) => {
   return (
     <View style={styles.inputsSection}>
@@ -33,19 +40,49 @@ const LocationInputs: React.FC<LocationInputsProps> = ({
         </ThemedText>
       </View>
 
-      <GooglePlacesInput
-        location={origin}
-        setLocation={setOrigin}
-        placeholder="Enter starting point"
-        label="Origin"
-      />
+      <View style={styles.originWrapper}>
+        <View style={styles.inputGroup}>
+          <View style={styles.inputContainer}>
+            <GooglePlacesInput
+              location={origin}
+              setLocation={setOrigin}
+              placeholder="Enter starting point"
+              label="Origin"
+            />
+          </View>
+          <TouchableOpacity
+            style={[
+              styles.mapButton,
+              mapTapMode === "origin" && styles.mapButtonActive,
+            ]}
+            onPress={onMapTapOrigin}
+          >
+            <MapPin size={18} color={mapTapMode === "origin" ? "#fff" : "#4285F4"} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
-      <GooglePlacesInput
-        location={destination}
-        setLocation={setDestination}
-        placeholder="Enter destination"
-        label="Destination"
-      />
+      <View style={styles.destinationWrapper}>
+        <View style={styles.inputGroup}>
+          <View style={styles.inputContainer}>
+            <GooglePlacesInput
+              location={destination}
+              setLocation={setDestination}
+              placeholder="Enter destination"
+              label="Destination"
+            />
+          </View>
+          <TouchableOpacity
+            style={[
+              styles.mapButton,
+              mapTapMode === "destination" && styles.mapButtonActive,
+            ]}
+            onPress={onMapTapDestination}
+          >
+            <MapPin size={18} color={mapTapMode === "destination" ? "#fff" : "#4285F4"} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -79,6 +116,38 @@ const LocationInputs: React.FC<LocationInputsProps> = ({
 const styles = StyleSheet.create({
   inputsSection: {
     marginBottom: 8,
+  },
+  inputGroup: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 8,
+  },
+  inputContainer: {
+    flex: 1,
+  },
+  originWrapper: {
+    zIndex: 2,
+    elevation: 2,
+  },
+  destinationWrapper: {
+    zIndex: 1,
+    elevation: 1,
+  },
+  mapButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    marginBottom: 0,
+    bottom: 6
+  },
+  mapButtonActive: {
+    backgroundColor: "#4285F4",
+    borderColor: "#4285F4",
   },
   titleContainer: {
     alignItems: "center",

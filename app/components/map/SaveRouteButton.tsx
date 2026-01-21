@@ -16,7 +16,6 @@ const SaveRouteButton: React.FC<SaveRouteButtonProps> = ({
     return (
       <TouchableOpacity style={styles.fullScreenSaveButton} onPress={onPress}>
         <Save color="#fff" size={20} style={styles.buttonIcon} />
-        <ThemedText style={styles.fullScreenButtonText}>Save Route</ThemedText>
       </TouchableOpacity>
     );
   }
@@ -39,6 +38,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     marginTop: 8,
+    marginBottom:6,
   },
   saveButtonText: {
     color: "#fff",

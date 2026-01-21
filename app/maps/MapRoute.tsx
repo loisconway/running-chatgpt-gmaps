@@ -11,12 +11,14 @@ import "react-native-get-random-values";
 import useLocation from "../hooks/useLocation";
 import useRoutes from "../hooks/useRoutes";
 import useSavedRoutes from "../hooks/useSavedRoutes";
+import { useGeocoding } from "../hooks/useGeocoding";
 
 // Components that are safe to import directly
 import LocationInputs from "../components/map/LocationInputs";
 import SaveRouteButton from "../components/map/SaveRouteButton";
 import MapControls from "../components/map/MapControls";
 import RouteDistance from "../components/map/RouteDistance";
+import RouteStatsCard from "../components/map/RouteStatsCard";
 import LoadingOverlay from "../components/map/LoadingOverlay";
 import SaveRouteModal from "../components/map/SaveRouteModal";
 
@@ -30,6 +32,7 @@ const MapRouteWeb =
 
 // Types
 import type { SavedRoute } from "../services/routeStorage";
+import { Pressable } from "react-native";
 
 interface MapRouteProps {
   savedRoute?: SavedRoute;
@@ -47,15 +50,18 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
     encodedPolyline,
     loading: routeLoading,
     routeDistance,
+    routeStats,
     requestRoute,
     resetRoute,
     loadSavedRoute,
   } = useRoutes();
   const { savedRoutesCount, handleSaveRoute } = useSavedRoutes();
+  const { reverseGeocode } = useGeocoding();
 
   // Local state
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
   const [saveModalVisible, setSaveModalVisible] = useState<boolean>(false);
+  const [mapTapMode, setMapTapMode] = useState<"origin" | "destination" | null>(null);
   const mapRef = useRef<any>(null);
 
   // Effects
@@ -81,6 +87,31 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen);
+  };
+
+  const handleMapPress = async (latitude: number, longitude: number) => {
+    // Get the place name using reverse geocoding
+    const placeName = await reverseGeocode(latitude, longitude);
+    
+    if (mapTapMode === "origin") {
+      setOrigin({
+        name: placeName,
+        placeId: `${latitude},${longitude}`,
+        latitude,
+        longitude,
+      });
+      setMapTapMode(null);
+      Alert.alert("Success", `Start location set to: ${placeName}`);
+    } else if (mapTapMode === "destination") {
+      setDestination({
+        name: placeName,
+        placeId: `${latitude},${longitude}`,
+        latitude,
+        longitude,
+      });
+      setMapTapMode(null);
+      Alert.alert("Success", `Destination set to: ${placeName}`);
+    }
   };
 
   const handleSaveRouteClick = () => {
@@ -150,6 +181,7 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
               currentLocation={currentLocation}
               origin={origin}
               destination={destination}
+              onMapPress={handleMapPress}
             />
           )}
         </Suspense>
@@ -185,6 +217,9 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
               onGetDirections={handleGetDirections}
               onReset={resetRoute}
               loading={routeLoading}
+              onMapTapOrigin={() => setMapTapMode("origin")}
+              onMapTapDestination={() => setMapTapMode("destination")}
+              mapTapMode={mapTapMode}
             />
 
             {route.length > 0 && (
@@ -201,8 +236,25 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
         >
           {renderMap()}
 
+          {mapTapMode && (
+            <View style={styles.tapModeOverlay}>
+              <ThemedText style={styles.tapModeText}>
+                {mapTapMode === "origin"
+                  ? "Tap on the map to set start location"
+                  : "Tap on the map to set destination"}
+              </ThemedText>
+              <Pressable
+                style={styles.cancelTapButton}
+                onPress={() => setMapTapMode(null)}
+              >
+                <ThemedText style={styles.cancelTapButtonText}>Cancel</ThemedText>
+              </Pressable>
+            </View>
+          )}
+
           <LoadingOverlay visible={locationLoading || routeLoading} />
           <RouteDistance distance={routeDistance} isFullScreen={isFullScreen} />
+          <RouteStatsCard stats={routeStats} isFullScreen={isFullScreen} />
 
           <MapControls
             isFullScreen={isFullScreen}
@@ -247,11 +299,42 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "#ddd",
+    position: "relative",
   },
   fullScreenMapContainer: {
     borderRadius: 0,
     borderWidth: 0,
     marginBottom: 0,
+  },
+  tapModeOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    padding: 16,
+    zIndex: 50,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  tapModeText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+    flex: 1,
+  },
+  cancelTapButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#FF6B6B",
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  cancelTapButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 12,
   },
   loadingContainer: {
     flex: 1,

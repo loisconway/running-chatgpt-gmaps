@@ -113,10 +113,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: "600",
+    color: "#000",
   },
   modalLabel: {
     fontSize: 14,
     marginBottom: 8,
+    color: "#666",
   },
   modalInput: {
     borderWidth: 1,
@@ -125,6 +127,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     marginBottom: 20,
+    color: "#000",
   },
   modalButtonContainer: {
     flexDirection: "row",
@@ -138,7 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalCancelButton: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#ef4444",
     marginRight: 8,
   },
   modalSaveButton: {
@@ -146,6 +149,7 @@ const styles = StyleSheet.create({
   },
   modalCancelButtonText: {
     fontWeight: "600",
+    color: "#fff",
   },
   modalSaveButtonText: {
     color: "#fff",

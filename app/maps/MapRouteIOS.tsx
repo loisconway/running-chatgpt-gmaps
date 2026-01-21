@@ -11,6 +11,7 @@ type MapProps = {
   currentLocation: LocationType | null;
   origin: LocationType | null;
   destination: LocationType | null;
+  onMapPress?: (latitude: number, longitude: number) => void;
 };
 
 const MapIOS: React.FC<MapProps> = ({
@@ -18,6 +19,7 @@ const MapIOS: React.FC<MapProps> = ({
   origin,
   destination,
   currentLocation,
+  onMapPress,
 }) => {
   const mapRef = useRef<MapView>(null);
 
@@ -38,6 +40,12 @@ const MapIOS: React.FC<MapProps> = ({
         showsUserLocation
         showsMyLocationButton
         showsCompass
+        onPress={(e) => {
+          if (onMapPress) {
+            const { latitude, longitude } = e.nativeEvent.coordinate;
+            onMapPress(latitude, longitude);
+          }
+        }}
         initialRegion={{
           latitude: currentLocation?.latitude || 51.4828,
           longitude: currentLocation?.longitude || 0.00194,

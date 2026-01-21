@@ -55,9 +55,7 @@ const MapControls: React.FC<MapControlsProps> = ({
           ) : (
             <View style={styles.routeButtonContent}>
               <Navigation color="#fff" size={20} />
-              <ThemedText style={styles.fullScreenButtonText}>
-                Get Walking Route
-              </ThemedText>
+              
             </View>
           )}
         </TouchableOpacity>
