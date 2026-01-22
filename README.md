@@ -5,12 +5,13 @@ For example: 'I want to run 10km starting in Greenwich and ending in whitechapel
 The app would then use AI to generate plot points for a map and generate the route. 
 
 ## Currently
-- Render a route between two points
 - Save and reload routes (up to 5 can be saved)
-- Add start and end by clicking on the map
+- Enter drawing mode to add or remove points on a map
 - Start/end lat/long transformed into addresses using reverse geocoding
-- Autocomplete when searching locations (broken woops)
 - Pop up modal for route details: distance, estimated time, elevation
+- Elevation graph
+- Pace setting for estimated times
+  
 
 
 https://github.com/user-attachments/assets/d7281bf7-0b49-4345-8598-f4492d2dc8e1
