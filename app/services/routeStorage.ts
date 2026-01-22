@@ -15,9 +15,18 @@ export type SavedRoute = {
     latitude: number;
     longitude: number;
   };
+  waypoints?: Array<{
+    name: string;
+    placeId: string;
+    latitude: number;
+    longitude: number;
+  }>;
   polyline: string; // Encoded polyline
   createdAt: number;
   distance: string;
+  elevation?: string;
+  estimatedTime?: string;
+  pace?: number;
 };
 
 const ROUTES_STORAGE_KEY = "saved_walking_routes";

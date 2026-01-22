@@ -10,6 +10,7 @@ interface MapControlsProps {
   onGetDirections?: () => void;
   loading?: boolean;
   hasOriginAndDestination?: boolean;
+  routeDrawingMode?: boolean;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
@@ -18,6 +19,7 @@ const MapControls: React.FC<MapControlsProps> = ({
   onGetDirections,
   loading = false,
   hasOriginAndDestination = false,
+  routeDrawingMode = false,
 }) => {
   if (!isFullScreen) {
     return (
@@ -33,7 +35,10 @@ const MapControls: React.FC<MapControlsProps> = ({
   return (
     <>
       <TouchableOpacity
-        style={styles.exitFullScreenButton}
+        style={[
+          styles.exitFullScreenButton,
+          routeDrawingMode && styles.exitFullScreenButtonDrawingMode,
+        ]}
         onPress={onToggleFullScreen}
       >
         <View style={styles.exitButtonContent}>
@@ -67,8 +72,8 @@ const MapControls: React.FC<MapControlsProps> = ({
 const styles = StyleSheet.create({
   fullScreenButton: {
     position: "absolute",
-    top: 16,
-    right: 16,
+    top: 70,
+    right: 20,
     backgroundColor: "white",
     borderRadius: 8,
     padding: 8,
@@ -86,6 +91,9 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
     zIndex: 10,
+  },
+  exitFullScreenButtonDrawingMode: {
+    top: 70,
   },
   exitButtonContent: {
     flexDirection: "row",

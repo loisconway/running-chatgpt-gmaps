@@ -11,7 +11,10 @@ type MapProps = {
   currentLocation: LocationType | null;
   origin: LocationType | null;
   destination: LocationType | null;
+  waypoints?: LocationType[];
   onMapPress?: (latitude: number, longitude: number) => void;
+  onMarkerPress?: (type: "origin" | "destination") => void;
+  onWaypointPress?: (index: number) => void;
 };
 
 const MapIOS: React.FC<MapProps> = ({
@@ -19,7 +22,10 @@ const MapIOS: React.FC<MapProps> = ({
   origin,
   destination,
   currentLocation,
+  waypoints = [],
   onMapPress,
+  onMarkerPress,
+  onWaypointPress,
 }) => {
   const mapRef = useRef<MapView>(null);
 
@@ -59,6 +65,7 @@ const MapIOS: React.FC<MapProps> = ({
             title="Start"
             description={origin.name}
             pinColor="#4CAF50"
+            onPress={() => onMarkerPress?.("origin")}
           />
         )}
 
@@ -68,15 +75,28 @@ const MapIOS: React.FC<MapProps> = ({
             title="End"
             description={destination.name}
             pinColor="#F44336"
+            onPress={() => onMarkerPress?.("destination")}
           />
         )}
+
+        {waypoints.map((waypoint, index) => (
+          <Marker
+            key={`waypoint-${index}`}
+            coordinate={waypoint}
+            title={`Waypoint ${index + 1}`}
+            description={waypoint.name}
+            pinColor="#FFA500"
+            onPress={() => onWaypointPress?.(index)}
+          />
+        ))}
 
         {route.length > 0 && (
           <Polyline
             coordinates={route}
-            strokeWidth={5}
+            strokeWidth={2}
             strokeColor="#4285F4"
             lineDashPattern={[0]}
+          
           />
         )}
       </MapView>

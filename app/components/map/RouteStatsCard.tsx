@@ -3,11 +3,20 @@ import { useState } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { Clock, Mountain, Route, X } from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
+import ElevationProfile from "./ElevationProfile";
+
+interface ElevationPoint {
+  elevation: number;
+  distance: number;
+}
 
 interface RouteStats {
   distance: string;
   elevation?: string;
   estimatedTime?: string;
+  pace?: number;
+  elevationProfile?: ElevationPoint[];
+  totalDistanceMeters?: number;
 }
 
 interface RouteStatsCardProps {
@@ -57,7 +66,9 @@ const RouteStatsCard: React.FC<RouteStatsCardProps> = ({
         <View style={styles.statRow}>
           <Clock size={18} color="#4285F4" />
           <View style={styles.statInfo}>
-            <ThemedText style={styles.statLabel}>Est. Time</ThemedText>
+            <ThemedText style={styles.statLabel}>
+              Est. Time {stats.pace && `(${Math.floor(stats.pace)}:${Math.round((stats.pace % 1) * 60).toString().padStart(2, "0")} min/km pace)`}
+            </ThemedText>
             <ThemedText style={styles.statValue}>{stats.estimatedTime}</ThemedText>
           </View>
         </View>
@@ -68,8 +79,16 @@ const RouteStatsCard: React.FC<RouteStatsCardProps> = ({
         <View style={styles.statRow}>
           <Mountain size={18} color="#4285F4" />
           <View style={styles.statInfo}>
-            <ThemedText style={styles.statLabel}>Elevation</ThemedText>
-            <ThemedText style={styles.statValue}>{stats.elevation}</ThemedText>
+            <ThemedText style={styles.statLabel}>Elevation Gain</ThemedText>
+            <View style={styles.elevationContent}>
+              <ThemedText style={styles.statValue}>{stats.elevation}</ThemedText>
+              {stats.elevationProfile && stats.elevationProfile.length > 1 && stats.totalDistanceMeters && (
+                <ElevationProfile
+                  elevationData={stats.elevationProfile}
+                  totalDistance={stats.totalDistanceMeters}
+                />
+              )}
+            </View>
           </View>
         </View>
       )}
@@ -136,7 +155,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     right: 12,
     left: 12,
-    maxWidth: 280,
+    // maxWidth: 280,
   },
   expandedContainerFullScreen: {
     bottom: 24,
@@ -168,6 +187,13 @@ const styles = StyleSheet.create({
   },
   statInfo: {
     flex: 1,
+
+  },
+  elevationContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 2,
   },
   statLabel: {
     fontSize: 11,
@@ -178,7 +204,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#fff",
     fontWeight: "600",
-    marginTop: 2,
   },
 });
 

@@ -1,5 +1,5 @@
 import type React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { TouchableOpacity, ActivityIndicator } from "react-native";
 import { MapPin } from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
@@ -36,19 +36,28 @@ const LocationInputs: React.FC<LocationInputsProps> = ({
     <View style={styles.inputsSection}>
       <View style={styles.titleContainer}>
         <ThemedText type="title" style={styles.title}>
-          Walking Route Planner
+          Route Planner
         </ThemedText>
       </View>
 
       <View style={styles.originWrapper}>
         <View style={styles.inputGroup}>
           <View style={styles.inputContainer}>
-            <GooglePlacesInput
+            <Text style={styles.label}>Origin</Text>
+            <TouchableOpacity 
+              style={styles.fakeInput}
+              onPress={onMapTapOrigin}
+            >
+              <Text style={origin?.name ? styles.inputText : styles.placeholderText}>
+                {origin?.name || "Choose start"}
+              </Text>
+            </TouchableOpacity>
+            {/* <GooglePlacesInput
               location={origin}
               setLocation={setOrigin}
               placeholder="Enter starting point"
               label="Origin"
-            />
+            /> */}
           </View>
           <TouchableOpacity
             style={[
@@ -65,12 +74,21 @@ const LocationInputs: React.FC<LocationInputsProps> = ({
       <View style={styles.destinationWrapper}>
         <View style={styles.inputGroup}>
           <View style={styles.inputContainer}>
-            <GooglePlacesInput
+            <Text style={styles.label}>Destination</Text>
+            <TouchableOpacity 
+              style={styles.fakeInput}
+              onPress={onMapTapDestination}
+            >
+              <Text style={destination?.name ? styles.inputText : styles.placeholderText}>
+                {destination?.name || "Choose end"}
+              </Text>
+            </TouchableOpacity>
+            {/* <GooglePlacesInput
               location={destination}
               setLocation={setDestination}
               placeholder="Enter destination"
               label="Destination"
-            />
+            /> */}
           </View>
           <TouchableOpacity
             style={[
@@ -94,7 +112,7 @@ const LocationInputs: React.FC<LocationInputsProps> = ({
             <ActivityIndicator color="#fff" size="small" />
           ) : (
             <ThemedText style={styles.buttonText}>
-              Get Walking Directions
+              Get Directions
             </ThemedText>
           )}
         </TouchableOpacity>
@@ -124,6 +142,29 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flex: 1,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: 4,
+    color: "#ddd",
+  },
+  fakeInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: "#fff",
+    minHeight: 48,
+    justifyContent: "center",
+  },
+  inputText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: "#999",
   },
   originWrapper: {
     zIndex: 2,
