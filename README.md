@@ -12,6 +12,10 @@ The app would then use AI to generate plot points for a map and generate the rou
 - Autocomplete when searching locations (broken woops)
 - Pop up modal for route details: distance, estimated time, elevation
 
+
+https://github.com/user-attachments/assets/d7281bf7-0b49-4345-8598-f4492d2dc8e1
+
+
 ## To-Do
 - AI implementation 
 - How I plan to match up AI to maps
