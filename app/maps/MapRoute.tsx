@@ -118,6 +118,8 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
     }
   };
 
+  // Other handlers
+
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen);
   };
@@ -153,9 +155,14 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
         };
         setOrigin(newOrigin);
         // Update name asynchronously
-        reverseGeocode(latitude, longitude).then(placeName => {
-          setOrigin(prev => prev ? {...prev, name: placeName} : prev);
-        });
+        reverseGeocode(latitude, longitude)
+          .then(placeName => {
+            setOrigin(prev => prev ? {...prev, name: placeName} : prev);
+          })
+          .catch(error => {
+            console.error('Error geocoding origin:', error);
+            // Keep the placeholder name if geocoding fails
+          });
       } else if (!destination) {
         // Second point: set as destination immediately
         const newDest = {
@@ -166,9 +173,14 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
         };
         setDestination(newDest);
         // Update name asynchronously
-        reverseGeocode(latitude, longitude).then(placeName => {
-          setDestination(prev => prev ? {...prev, name: placeName} : prev);
-        });
+        reverseGeocode(latitude, longitude)
+          .then(placeName => {
+            setDestination(prev => prev ? {...prev, name: placeName} : prev);
+          })
+          .catch(error => {
+            console.error('Error geocoding destination:', error);
+            // Keep the placeholder name if geocoding fails
+          });
       } else {
         // Third+ point: convert current destination to waypoint, set new point as destination
         addWaypoint(destination);
@@ -180,9 +192,14 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
         };
         setDestination(newDest);
         // Update name asynchronously
-        reverseGeocode(latitude, longitude).then(placeName => {
-          setDestination(prev => prev ? {...prev, name: placeName} : prev);
-        });
+        reverseGeocode(latitude, longitude)
+          .then(placeName => {
+            setDestination(prev => prev ? {...prev, name: placeName} : prev);
+          })
+          .catch(error => {
+            console.error('Error geocoding destination:', error);
+            // Keep the placeholder name if geocoding fails
+          });
       }
       return;
     }
@@ -198,9 +215,14 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
       setOrigin(newOrigin);
       setMapTapMode(null);
       // Update name asynchronously
-      reverseGeocode(latitude, longitude).then(placeName => {
-        setOrigin(prev => prev ? {...prev, name: placeName} : prev);
-      });
+      reverseGeocode(latitude, longitude)
+        .then(placeName => {
+          setOrigin(prev => prev ? {...prev, name: placeName} : prev);
+        })
+        .catch(error => {
+          console.error('Error geocoding origin:', error);
+          // Keep the placeholder name if geocoding fails
+        });
     } else if (mapTapMode === "destination") {
       const newDest = {
         name: placeholderName,
@@ -211,9 +233,14 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
       setDestination(newDest);
       setMapTapMode(null);
       // Update name asynchronously
-      reverseGeocode(latitude, longitude).then(placeName => {
-        setDestination(prev => prev ? {...prev, name: placeName} : prev);
-      });
+      reverseGeocode(latitude, longitude)
+        .then(placeName => {
+          setDestination(prev => prev ? {...prev, name: placeName} : prev);
+        })
+        .catch(error => {
+          console.error('Error geocoding destination:', error);
+          // Keep the placeholder name if geocoding fails
+        });
     }
   };
 

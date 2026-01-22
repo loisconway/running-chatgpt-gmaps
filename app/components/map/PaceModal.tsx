@@ -45,6 +45,10 @@ const PaceModal: React.FC<PaceModalProps> = ({
     const min = parseInt(minutes) || 0;
     const sec = parseInt(seconds) || 0;
     const totalMinutes = min + sec / 60;
+    if (totalMinutes <= 0) {
+      // Invalid pace, do not save
+      return;
+    }
     setPace(totalMinutes);
     onClose();
   };
