@@ -1,3 +1,9 @@
+/**
+ * ErrorBoundary component to catch and display errors in the app
+ * TODO: Enhance with logging service integration, and a more user-friendly UI that matches the rest of the app
+ * I also need to test this
+ */
+
 import React, { Component, ReactNode } from 'react';
 import { View, Text, Button } from 'react-native';
 
@@ -7,13 +13,14 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  error?: Error;
 }
 
 class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 
-  static getDerivedStateFromError(_error: Error): State {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
