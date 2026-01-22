@@ -37,7 +37,7 @@ I have an identified issue with trying to import react-native internals not supp
 - Delete commented/dead code, I keep it around for a bit while I am working on it in case I want to reference it
 - Look at different mapping options, the gmaps api is a bit tricky sometimes and it can be confusing what is behind a paywall and what is not
 - Fix web app 
-- Deploy app to web (once fixed), Testflight for IOS, and Android -> I am an apple user so Android deployment is less of a priority personally but will be on the list
+- Deploy app to web (once fixed), Testflight for iOS, and Android -> I am an Apple user so Android deployment is less of a priority personally but will be on the list
 
 
 # Running the app 
