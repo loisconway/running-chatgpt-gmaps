@@ -27,27 +27,35 @@ type RouteResponse = {
   }>;
 };
 
+export type ElevationPoint = {
+  elevation: number;
+  distance: number; // cumulative distance in meters
+};
+
 type RouteStats = {
   distance: string;
   elevation?: string;
   estimatedTime?: string;
+  pace?: number;
+  elevationProfile?: ElevationPoint[];
+  totalDistanceMeters?: number;
 };
 
 const useRoutes = () => {
   const [origin, setOrigin] = useState<LocationType | null>(null);
   const [destination, setDestination] = useState<LocationType | null>(null);
+  const [waypoints, setWaypoints] = useState<LocationType[]>([]);
   const [route, setRoute] = useState<LocationType[]>([]);
   const [encodedPolyline, setEncodedPolyline] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [routeDistance, setRouteDistance] = useState<string>("");
   const [routeStats, setRouteStats] = useState<RouteStats>({ distance: "" });
+  const [pace, setPace] = useState<number>(6); // min/km, default 6:00 min/km
 
-  // Calculate estimated time based on distance (average walking speed: 5 km/h)
+  // Calculate estimated time based on distance and pace (min/km)
   const calculateEstimatedTime = (distanceMeters: number): string => {
-    const speedKmh = 5; // Average walking speed
     const distanceKm = distanceMeters / 1000;
-    const hours = distanceKm / speedKmh;
-    const minutes = Math.round(hours * 60);
+    const minutes = Math.round(distanceKm * pace);
     
     if (minutes < 60) {
       return `${minutes}m`;
@@ -58,15 +66,64 @@ const useRoutes = () => {
     }
   };
 
-  // Calculate elevation gain from decoded polyline (approximate)
-  const calculateElevationGain = (decodedPath: LocationType[]): string => {
-    // Note: The Google Routes API v2 doesn't return elevation data directly
-    // This is a placeholder that estimates elevation based on typical London terrain
-    // In production, you'd use the Google Elevation API with the decoded path
-    
-    // For now, return a realistic estimate for London routes (relatively flat)
-    // This could be enhanced to call the Elevation API if needed
-    return "+45m";
+  // Calculate elevation gain from decoded polyline using Google Elevation API
+  const calculateElevationGain = async (
+    decodedPath: LocationType[],
+    totalDistanceMeters: number
+  ): Promise<{ gain: string; profile: ElevationPoint[] }> => {
+    try {
+      // Sample points to avoid hitting API limits (max 512 points per request)
+      const maxSamples = 100;
+      const step = Math.max(1, Math.floor(decodedPath.length / maxSamples));
+      const sampledPoints = decodedPath.filter((_, index) => index % step === 0);
+
+      // Build locations string for API
+      const locations = sampledPoints
+        .map(point => `${point.latitude},${point.longitude}`)
+        .join('|');
+
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/elevation/json?locations=${locations}&key=${apiKey}`
+      );
+
+      const data = await response.json();
+
+      if (data.status === 'OK' && data.results && data.results.length > 0) {
+        // Calculate elevation gain (sum of positive elevation changes)
+        let totalGain = 0;
+        const profile: ElevationPoint[] = [];
+
+        for (let i = 0; i < data.results.length; i++) {
+          // Calculate cumulative distance for each point
+          const distanceRatio = i / (data.results.length - 1);
+          const cumulativeDistance = distanceRatio * totalDistanceMeters;
+
+          profile.push({
+            elevation: data.results[i].elevation,
+            distance: cumulativeDistance,
+          });
+
+          // Calculate gain
+          if (i > 0) {
+            const elevationChange = data.results[i].elevation - data.results[i - 1].elevation;
+            if (elevationChange > 0) {
+              totalGain += elevationChange;
+            }
+          }
+        }
+
+        return {
+          gain: `+${Math.round(totalGain)}m`,
+          profile,
+        };
+      }
+
+      // Fallback if API fails
+      return { gain: "Elevation Unknown", profile: [] };
+    } catch (error) {
+      console.error("Elevation API error:", error);
+      return { gain: "Elevation Unknown", profile: [] };
+    }
   };
 
   // Check if a placeId is actually coordinates (contains comma)
@@ -107,11 +164,16 @@ const useRoutes = () => {
 
     setLoading(true);
     try {
-      const reqBody = {
+      const reqBody: any = {
         origin: buildLocationObject(origin),
         destination: buildLocationObject(destination),
         travelMode: "WALK", // Set travel mode to walking
       };
+
+      // Add waypoints if they exist
+      if (waypoints.length > 0) {
+        reqBody.intermediates = waypoints.map((waypoint) => buildLocationObject(waypoint));
+      }
 
       console.log("🚀 Request Body:", JSON.stringify(reqBody, null, 2));
 
@@ -147,32 +209,39 @@ const useRoutes = () => {
         const decodedPath = decodePolyline(polyline);
         setRoute(decodedPath);
 
-        // Extract and set distance information
-        if (
-          data.routes[0].legs &&
-          data.routes[0].legs.length > 0 &&
-          data.routes[0].legs[0].distanceMeters
-        ) {
-          const distanceInMeters = data.routes[0].legs[0].distanceMeters;
+        // Extract and set distance information - sum all legs for total distance
+        if (data.routes[0].legs && data.routes[0].legs.length > 0) {
+          // Sum distance across all legs (origin -> waypoint(s) -> destination)
+          const totalDistanceInMeters = data.routes[0].legs.reduce(
+            (sum, leg) => sum + (leg.distanceMeters || 0),
+            0
+          );
+          
           let distanceString = "";
           
-          if (distanceInMeters < 1000) {
-            distanceString = `${distanceInMeters} m`;
+          if (totalDistanceInMeters < 1000) {
+            distanceString = `${totalDistanceInMeters} m`;
           } else {
-            const distanceInKm = (distanceInMeters / 1000).toFixed(2);
+            const distanceInKm = (totalDistanceInMeters / 1000).toFixed(2);
             distanceString = `${distanceInKm} km`;
           }
           
           setRouteDistance(distanceString);
 
-          // Calculate additional stats
-          const estimatedTime = calculateEstimatedTime(distanceInMeters);
-          const elevation = calculateElevationGain(decodedPath);
+          // Calculate additional stats using total distance
+          const estimatedTime = calculateEstimatedTime(totalDistanceInMeters);
+          const { gain: elevation, profile: elevationProfile } = await calculateElevationGain(
+            decodedPath,
+            totalDistanceInMeters
+          );
 
           setRouteStats({
             distance: distanceString,
             estimatedTime,
             elevation,
+            pace,
+            elevationProfile,
+            totalDistanceMeters: totalDistanceInMeters,
           });
         }
 
@@ -204,6 +273,7 @@ const useRoutes = () => {
   const resetRoute = () => {
     setOrigin(null);
     setDestination(null);
+    setWaypoints([]);
     setRoute([]);
     setEncodedPolyline("");
     setRouteDistance("");
@@ -230,15 +300,38 @@ const useRoutes = () => {
       });
     }
 
+    // Load waypoints if they exist
+    if (savedRoute.waypoints && Array.isArray(savedRoute.waypoints)) {
+      setWaypoints(savedRoute.waypoints.map((wp: any) => ({
+        placeId: wp.placeId,
+        name: wp.name,
+        latitude: wp.latitude,
+        longitude: wp.longitude,
+      })));
+    }
+
+    // Set pace if available
+    if (savedRoute.pace) {
+      setPace(savedRoute.pace);
+    }
+
     // Set the polyline and decode it
     if (savedRoute.polyline) {
       setEncodedPolyline(savedRoute.polyline);
       const decodedPath = decodePolyline(savedRoute.polyline);
       setRoute(decodedPath);
 
-      // Set distance if available
+      // Set full route stats if available
       if (savedRoute.distance) {
         setRouteDistance(savedRoute.distance);
+        setRouteStats({
+          distance: savedRoute.distance,
+          elevation: savedRoute.elevation,
+          estimatedTime: savedRoute.estimatedTime,
+          pace: savedRoute.pace,
+          // Note: elevationProfile is not saved to reduce storage size
+          // It will be recalculated if needed
+        });
       }
     }
   };
@@ -248,11 +341,17 @@ const useRoutes = () => {
     setOrigin,
     destination,
     setDestination,
+    waypoints,
+    setWaypoints,
+    addWaypoint: (waypoint: LocationType) => setWaypoints([...waypoints, waypoint]),
+    removeWaypoint: (index: number) => setWaypoints(waypoints.filter((_, i) => i !== index)),
     route,
     encodedPolyline,
     loading,
     routeDistance,
     routeStats,
+    pace,
+    setPace,
     requestRoute,
     resetRoute,
     loadSavedRoute,

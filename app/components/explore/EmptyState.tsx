@@ -10,7 +10,7 @@ const EmptyState: React.FC = () => {
       <Map size={60} color="#ccc" />
       <ThemedText style={styles.emptyTitle}>No Saved Routes</ThemedText>
       <ThemedText style={styles.emptyText}>
-        Your saved walking routes will appear here. Go to the Home tab to create
+        Your saved routes will appear here. Go to the Home tab to create
         and save routes.
       </ThemedText>
     </ThemedView>

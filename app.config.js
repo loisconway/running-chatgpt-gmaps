@@ -3,7 +3,7 @@ import "dotenv/config";
 
 export default {
   expo: {
-    name: "Walking Route Planner",
+    name: "Route Planner",
     slug: "running-maps-chatgpt",
     version: "1.0.0",
     orientation: "portrait",
@@ -23,7 +23,7 @@ export default {
       },
       infoPlist: {
         NSLocationWhenInUseUsageDescription:
-          "This app uses your location to show walking routes near you.",
+          "This app uses your location to show routes near you.",
       },
     },
     android: {
@@ -51,7 +51,7 @@ plugins: [
     "expo-location",
     {
       locationAlwaysAndWhenInUsePermission:
-        "Allow this app to use your location to show walking routes near you.",
+        "Allow this app to use your location to show routes near you.",
     },
   ],
 ],

@@ -2,7 +2,8 @@
 
 import type React from "react";
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
-import { View, StyleSheet, Platform, SafeAreaView, Alert } from "react-native";
+import { View, StyleSheet, Platform, SafeAreaView, Alert, TouchableOpacity } from "react-native";
+import { Pencil, Check, Timer } from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import "react-native-get-random-values";
@@ -21,6 +22,7 @@ import RouteDistance from "../components/map/RouteDistance";
 import RouteStatsCard from "../components/map/RouteStatsCard";
 import LoadingOverlay from "../components/map/LoadingOverlay";
 import SaveRouteModal from "../components/map/SaveRouteModal";
+import PaceModal from "../components/map/PaceModal";
 
 // Dynamically import platform-specific map components
 const MapWeb = lazy(() => import("../components/map/MapWeb"));
@@ -46,11 +48,16 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
     setOrigin,
     destination,
     setDestination,
+    waypoints,
+    addWaypoint,
+    removeWaypoint,
     route,
     encodedPolyline,
     loading: routeLoading,
     routeDistance,
     routeStats,
+    pace,
+    setPace,
     requestRoute,
     resetRoute,
     loadSavedRoute,
@@ -62,6 +69,8 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
   const [saveModalVisible, setSaveModalVisible] = useState<boolean>(false);
   const [mapTapMode, setMapTapMode] = useState<"origin" | "destination" | null>(null);
+  const [routeDrawingMode, setRouteDrawingMode] = useState<boolean>(false);
+  const [paceModalVisible, setPaceModalVisible] = useState<boolean>(false);
   const mapRef = useRef<any>(null);
 
   // Effects
@@ -70,6 +79,30 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
       loadSavedRoute(savedRoute);
     }
   }, [savedRoute]);
+
+  // Auto-recalculate route when origin or destination changes (debounced, not in drawing mode)
+  useEffect(() => {
+    if (origin && destination && !routeLoading && !routeDrawingMode) {
+      const timer = setTimeout(() => {
+        handleGetDirections();
+      }, 500); // 500ms debounce
+      return () => clearTimeout(timer);
+    }
+  }, [origin?.placeId, destination?.placeId, waypoints.length, routeDrawingMode]);
+
+  // Recalculate stats when pace changes
+  useEffect(() => {
+    if (route.length > 0 && routeDistance) {
+      handleGetDirections();
+    }
+  }, [pace]);
+
+  // Auto-recalculate route in drawing mode (immediate, no debounce)
+  useEffect(() => {
+    if (origin && destination && !routeLoading && routeDrawingMode) {
+      handleGetDirections();
+    }
+  }, [origin?.placeId, destination?.placeId, waypoints.length, routeDrawingMode]);
 
   // Handlers
   const handleGetDirections = async () => {
@@ -89,28 +122,98 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
     setIsFullScreen(!isFullScreen);
   };
 
+  const handleUndoLastPoint = () => {
+    if (destination && waypoints.length > 0) {
+      // Move the last waypoint back to destination, remove current destination
+      const lastWaypoint = waypoints[waypoints.length - 1];
+      setDestination(lastWaypoint);
+      removeWaypoint(waypoints.length - 1);
+    } else if (destination) {
+      // Remove destination
+      setDestination(null);
+    } else if (origin) {
+      // Remove origin
+      setOrigin(null);
+    }
+  };
+
   const handleMapPress = async (latitude: number, longitude: number) => {
-    // Get the place name using reverse geocoding
-    const placeName = await reverseGeocode(latitude, longitude);
+    const coordsString = `${latitude},${longitude}`;
+    const placeholderName = `Point (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
     
+    // Route drawing mode logic
+    if (routeDrawingMode) {
+      if (!origin) {
+        // First point: set as origin immediately
+        const newOrigin = {
+          name: placeholderName,
+          placeId: coordsString,
+          latitude,
+          longitude,
+        };
+        setOrigin(newOrigin);
+        // Update name asynchronously
+        reverseGeocode(latitude, longitude).then(placeName => {
+          setOrigin(prev => prev ? {...prev, name: placeName} : prev);
+        });
+      } else if (!destination) {
+        // Second point: set as destination immediately
+        const newDest = {
+          name: placeholderName,
+          placeId: coordsString,
+          latitude,
+          longitude,
+        };
+        setDestination(newDest);
+        // Update name asynchronously
+        reverseGeocode(latitude, longitude).then(placeName => {
+          setDestination(prev => prev ? {...prev, name: placeName} : prev);
+        });
+      } else {
+        // Third+ point: convert current destination to waypoint, set new point as destination
+        addWaypoint(destination);
+        const newDest = {
+          name: placeholderName,
+          placeId: coordsString,
+          latitude,
+          longitude,
+        };
+        setDestination(newDest);
+        // Update name asynchronously
+        reverseGeocode(latitude, longitude).then(placeName => {
+          setDestination(prev => prev ? {...prev, name: placeName} : prev);
+        });
+      }
+      return;
+    }
+
+    // Normal mode logic
     if (mapTapMode === "origin") {
-      setOrigin({
-        name: placeName,
-        placeId: `${latitude},${longitude}`,
+      const newOrigin = {
+        name: placeholderName,
+        placeId: coordsString,
         latitude,
         longitude,
-      });
+      };
+      setOrigin(newOrigin);
       setMapTapMode(null);
-      Alert.alert("Success", `Start location set to: ${placeName}`);
+      // Update name asynchronously
+      reverseGeocode(latitude, longitude).then(placeName => {
+        setOrigin(prev => prev ? {...prev, name: placeName} : prev);
+      });
     } else if (mapTapMode === "destination") {
-      setDestination({
-        name: placeName,
-        placeId: `${latitude},${longitude}`,
+      const newDest = {
+        name: placeholderName,
+        placeId: coordsString,
         latitude,
         longitude,
-      });
+      };
+      setDestination(newDest);
       setMapTapMode(null);
-      Alert.alert("Success", `Destination set to: ${placeName}`);
+      // Update name asynchronously
+      reverseGeocode(latitude, longitude).then(placeName => {
+        setDestination(prev => prev ? {...prev, name: placeName} : prev);
+      });
     }
   };
 
@@ -149,8 +252,17 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
         latitude: destination.latitude,
         longitude: destination.longitude,
       },
+      waypoints: waypoints.map(wp => ({
+        name: wp.name || "",
+        placeId: wp.placeId || "",
+        latitude: wp.latitude,
+        longitude: wp.longitude,
+      })),
       polyline: encodedPolyline,
       distance: routeDistance,
+      elevation: routeStats.elevation,
+      estimatedTime: routeStats.estimatedTime,
+      pace,
     });
 
     if (success) {
@@ -181,7 +293,19 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
               currentLocation={currentLocation}
               origin={origin}
               destination={destination}
+              waypoints={waypoints}
               onMapPress={handleMapPress}
+              onMarkerPress={(type) => setMapTapMode(type)}
+              onWaypointPress={(index) => {
+                Alert.alert(
+                  "Remove Waypoint",
+                  `Remove ${waypoints[index].name}?`,
+                  [
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Remove", onPress: () => removeWaypoint(index), style: "destructive" },
+                  ]
+                );
+              }}
             />
           )}
         </Suspense>
@@ -236,12 +360,41 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
         >
           {renderMap()}
 
-          {mapTapMode && (
+          {routeDrawingMode && (
             <View style={styles.tapModeOverlay}>
               <ThemedText style={styles.tapModeText}>
+                {!origin
+                  ? "Tap to set start point"
+                  : !destination
+                  ? "Tap to set end point"
+                  : "Tap to extend route"}
+              </ThemedText>
+              <View style={styles.drawingModeButtons}>
+                {(origin || destination || waypoints.length > 0) && (
+                  <Pressable
+                    style={[styles.cancelTapButton, styles.undoButton]}
+                    onPress={handleUndoLastPoint}
+                  >
+                    <ThemedText style={styles.cancelTapButtonText}>Undo</ThemedText>
+                  </Pressable>
+                )}
+                <Pressable
+                  style={styles.cancelTapButton}
+                  onPress={() => setRouteDrawingMode(false)}
+                >
+                  <ThemedText style={styles.cancelTapButtonText}>Exit Drawing Mode</ThemedText>
+                </Pressable>
+              </View>
+            </View>
+          )}
+
+          {mapTapMode && !routeDrawingMode && (
+            <View style={styles.tapModeOverlay}>
+              <ThemedText style={styles.tapModeText}>
+                
                 {mapTapMode === "origin"
-                  ? "Tap on the map to set start location"
-                  : "Tap on the map to set destination"}
+                  ? ( origin ? "Tap to set new start": "Tap on the map to set start location")
+                  : (destination ? "Tap to set new destination" : "Tap on the map to set destination")}
               </ThemedText>
               <Pressable
                 style={styles.cancelTapButton}
@@ -253,7 +406,7 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
           )}
 
           <LoadingOverlay visible={locationLoading || routeLoading} />
-          <RouteDistance distance={routeDistance} isFullScreen={isFullScreen} />
+          {/* <RouteDistance distance={routeDistance} isFullScreen={isFullScreen} /> */}
           <RouteStatsCard stats={routeStats} isFullScreen={isFullScreen} />
 
           <MapControls
@@ -262,7 +415,29 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
             onGetDirections={handleGetDirections}
             loading={routeLoading}
             hasOriginAndDestination={!!(origin && destination)}
+            routeDrawingMode={routeDrawingMode}
           />
+
+          <TouchableOpacity
+            style={[styles.drawRouteButton, routeDrawingMode && styles.drawRouteButtonActive]}
+            onPress={() => setRouteDrawingMode(!routeDrawingMode)}
+          >
+            {routeDrawingMode ? (
+              <Check size={24} color="#fff" />
+            ) : (
+              <Pencil size={24} color="#fff" />
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.paceButton}
+            onPress={() => setPaceModalVisible(true)}
+          >
+            <Timer size={20} color="#fff" />
+            <ThemedText style={styles.paceButtonText}>
+              {Math.floor(pace)}:{Math.round((pace % 1) * 60).toString().padStart(2, "0")}
+            </ThemedText>
+          </TouchableOpacity>
 
           {isFullScreen && route.length > 0 && (
             <SaveRouteButton onPress={handleSaveRouteClick} fullScreen />
@@ -275,6 +450,13 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
           onSave={confirmSaveRoute}
           origin={origin}
           destination={destination}
+        />
+
+        <PaceModal
+          visible={paceModalVisible}
+          onClose={() => setPaceModalVisible(false)}
+          pace={pace}
+          setPace={setPace}
         />
       </ThemedView>
     </SafeAreaView>
@@ -324,17 +506,77 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flex: 1,
   },
+  drawingModeButtons: {
+    flexDirection: "row",
+    gap: 8,
+  },
   cancelTapButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     backgroundColor: "#FF6B6B",
     borderRadius: 6,
-    marginLeft: 8,
+  },
+  undoButton: {
+    backgroundColor: "#FFA500",
   },
   cancelTapButtonText: {
     color: "#fff",
     fontWeight: "600",
     fontSize: 12,
+  },
+  drawRouteButton: {
+    position: "absolute",
+    top: 12,
+    right: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#4285F4",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 40,
+  },
+  drawRouteButtonActive: {
+    backgroundColor: "#34A853",
+  },
+  drawRouteButtonText: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "600",
+  },
+  paceButton: {
+    position: "absolute",
+    top: 20,
+    left: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: "#9333EA",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 40,
+  },
+  paceButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingContainer: {
     flex: 1,
