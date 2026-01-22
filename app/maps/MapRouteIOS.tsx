@@ -43,7 +43,7 @@ const MapIOS: React.FC<MapProps> = ({
       <MapView
         ref={mapRef}
         style={styles.map}
-        showsUserLocation
+        // showsUserLocation
         showsMyLocationButton
         showsCompass
         onPress={(e) => {

@@ -92,10 +92,11 @@ const useRoutes = () => {
         // Calculate elevation gain (sum of positive elevation changes)
         let totalGain = 0;
         const profile: ElevationPoint[] = [];
-
+        const resultCount = data.results.length;
+        const denominator = resultCount > 1 ?  (resultCount - 1) : 1;
         for (let i = 0; i < data.results.length; i++) {
           // Calculate cumulative distance for each point
-          const distanceRatio = i / (data.results.length - 1);
+          const distanceRatio = i / denominator;
           const cumulativeDistance = distanceRatio * totalDistanceMeters;
 
           profile.push({
@@ -343,8 +344,8 @@ const useRoutes = () => {
     setDestination,
     waypoints,
     setWaypoints,
-    addWaypoint: (waypoint: LocationType) => setWaypoints([...waypoints, waypoint]),
-    removeWaypoint: (index: number) => setWaypoints(waypoints.filter((_, i) => i !== index)),
+    addWaypoint: (waypoint: LocationType) => setWaypoints((prevWaypoints) => [...prevWaypoints, waypoint]),
+    removeWaypoint: (index: number) => setWaypoints((prevWaypoints) => prevWaypoints.filter((_, i) => i !== index)),
     route,
     encodedPolyline,
     loading,

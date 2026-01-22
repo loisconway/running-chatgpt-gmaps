@@ -1,5 +1,5 @@
 "use client";
-
+// DEMO FILE FROM WHEN I FOLLOWED GOOGLE MAPS TUTORIAL FOR WEB
 /**
  * Copyright 2024 Google LLC
  *
