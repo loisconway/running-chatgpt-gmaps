@@ -1,10 +1,13 @@
+![Tests](https://github.com/YOUR_USERNAME/running-maps-chatgpt/actions/workflows/test.yml/badge.svg)
+
+
 # Route planning using AI
 ## The Plan
 The plan for this application (eventually) is for a user to be able to define the route they want to run in natural language and have a running route be created. 
 For example: 'I want to run 10km starting in Greenwich and ending in whitechapel, and where possible I want to go into parks' 
 The app would then use AI to generate plot points for a map and generate the route. 
 
-## Currently
+## Current App
 - Save and reload routes (up to 5 can be saved)
 - Enter drawing mode to add or remove points on a map
 - Start/end lat/long transformed into addresses using reverse geocoding
@@ -12,39 +15,33 @@ The app would then use AI to generate plot points for a map and generate the rou
 - Elevation graph
 - Pace setting for estimated times
   
-
-
+Demo (updated with major changes)
 https://github.com/user-attachments/assets/d7281bf7-0b49-4345-8598-f4492d2dc8e1
 
 
-## To-Do
+## To-Do (Idea Backlog)
 - AI implementation 
 - How I plan to match up AI to maps
 - Being able to change waypoints not just add or delete them
 - Extending route beyond quickest (like I am doing in my Next-js app), so you set a few points but you want it to be longer. I'm not sure yet if this is something I will try to tackle with AI.
 - UX needs a bit of a refresh, it isn't the prettiest map and generally think the map should take up more space, and the action buttons should just live on top of the map.
-- Error Boundaries 
 - Backend implementation to develop those skills
 
 
 
-## Woops I broke this app in web and Google Maps Autocomplete
-I think the gmaps api updated and I lost some features: autocomplete stopped working on my inputs but I removed this feature as soon I will try to go more towards AI powered inputs anyway. I also have an issue with trying to import react-native internals not supported on web. I need to make sure to separate concerns if I have web vs mobile. However, my current focus is for this app is mobile development so fixing the app in web is a later priority compared to adding new features.
+## Woops I broke this app in web
+I have an identified issue with trying to import react-native internals not supported on web. However, my current focus is for this app is mobile development so fixing the app in web is a later priority compared to adding new features.
 
-# To Do
-- Add a simple AI implementation simply looks for start and end points in a NL user input and transforms these to maps
-- Look at different mapping options, the gmaps api is a bit tricky sometimes
-- Fix web app
+# To Do (Tech Debt Backlog)
+- Look at different mapping options, the gmaps api is a bit tricky sometimes and it can be confusing what is behind a paywall and what is not
+- Fix web app 
+- Deploy app to web (once fixed), Testflight for IOS, and Android -> I am an apple user so Android deployment is less of a priority personally but will be on the list
 
-# To Do
-- Fix or remove GooglePlacesAutocomplete 
-- Add a simple AI implementation simply looks for start and end points in a NL user input and transforms these to maps
-- Look at different mapping options, the gmaps api is a bit tricky sometimes
-- Deploy app
 
 # Running the app 
 Running the app locally is pretty simple but you need a google maps api key (REACT_APP_GOOGLE_MAPS_API_KEY) in your .env 
 I looked into deployment but looked a little tricky with testflight etc for apple so just put that a bit further down the to do list while I develop more features.
+
 
 # Welcome to your Expo app 👋
 
@@ -58,7 +55,9 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    yarn install
    ```
 
-2. Start the app
+2. Add .env var for google maps integration. Look up google maps api for this.
+
+3. Start the app
 
    ```bash
     npx expo start
