@@ -1,3 +1,7 @@
+/**
+ * Tab layout component defining the bottom tab navigation structure
+ */
+
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';

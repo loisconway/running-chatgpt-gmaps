@@ -52,7 +52,7 @@ module.exports = (api) => {
       [
         "module:react-native-dotenv",
         {
-          moduleName: "@/environmentVariables",
+          moduleName: "@env",
           path: ".env",
           blacklist: null,
           whitelist: null,

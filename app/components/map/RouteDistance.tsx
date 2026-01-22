@@ -1,3 +1,9 @@
+/**
+ * Component to display the route distance overlay on the map
+ * I have stopped using this because I added a different modal for showing route details
+ * Will remove at some point
+ */
+
 import type React from "react";
 import { View, StyleSheet } from "react-native";
 import { Navigation } from "lucide-react-native";

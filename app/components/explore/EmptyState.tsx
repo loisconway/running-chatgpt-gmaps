@@ -1,3 +1,7 @@
+/**
+ * Component to display an empty state when there are no saved routes
+ */
+
 import type React from "react";
 import { StyleSheet } from "react-native";
 import { Map } from "lucide-react-native";

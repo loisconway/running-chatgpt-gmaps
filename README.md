@@ -23,6 +23,9 @@ https://github.com/user-attachments/assets/d7281bf7-0b49-4345-8598-f4492d2dc8e1
 - Being able to change waypoints not just add or delete them
 - Extending route beyond quickest (like I am doing in my Next-js app), so you set a few points but you want it to be longer. I'm not sure yet if this is something I will try to tackle with AI.
 - UX needs a bit of a refresh, it isn't the prettiest map and generally think the map should take up more space, and the action buttons should just live on top of the map.
+- Error Boundaries 
+- Backend implementation to develop those skills
+
 
 
 ## Woops I broke this app in web and Google Maps Autocomplete

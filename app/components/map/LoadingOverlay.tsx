@@ -1,3 +1,7 @@
+/**
+ * Loading overlay component to indicate loading state on the map
+ */
+
 import type React from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { ThemedText } from "@/components/ThemedText";

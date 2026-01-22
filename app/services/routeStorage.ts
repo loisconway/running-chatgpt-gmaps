@@ -1,3 +1,7 @@
+/**
+ * Service for saving, retrieving, and deleting routes using AsyncStorage
+ */
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type SavedRoute = {

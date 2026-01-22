@@ -1,4 +1,8 @@
-import React from "react";
+/**
+ * Component to display an elevation profile chart using SVG
+ */
+
+import React, { useMemo } from "react";
 import { View, StyleSheet } from "react-native";
 import Svg, { Path, Line, Text as SvgText } from "react-native-svg";
 
@@ -24,39 +28,58 @@ const ElevationProfile: React.FC<ElevationProfileProps> = ({
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
-  // Find min and max elevation
-  const elevations = elevationData.map((point) => point.elevation);
-  const minElevation = Math.floor(Math.min(...elevations));
-  const maxElevation = Math.ceil(Math.max(...elevations));
-  const elevationRange = maxElevation - minElevation || 1;
+  // Memoize expensive calculations
+  const { minElevation, maxElevation, elevationRange, pathData, filledPath, distanceMarkers, bottomY } = useMemo(() => {
+    // Find min and max elevation
+    const elevations = elevationData.map((point) => point.elevation);
+    const minElev = Math.floor(Math.min(...elevations));
+    const maxElev = Math.ceil(Math.max(...elevations));
+    const elevRange = maxElev - minElev || 1;
 
-  // Scale functions
+    // Scale functions
+    const scaleX = (distance: number) =>
+      padding.left + (distance / totalDistance) * chartWidth;
+    const scaleY = (elevation: number) =>
+      padding.top + chartHeight - ((elevation - minElev) / elevRange) * chartHeight;
+
+    // Generate path
+    const path = elevationData
+      .map((point, index) => {
+        const x = scaleX(point.distance);
+        const y = scaleY(point.elevation);
+        return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
+      })
+      .join(" ");
+
+    // Close the path to create filled area
+    const firstX = scaleX(elevationData[0].distance);
+    const lastX = scaleX(elevationData[elevationData.length - 1].distance);
+    const bottomY = padding.top + chartHeight;
+    const filled = `${path} L ${lastX} ${bottomY} L ${firstX} ${bottomY} Z`;
+
+    // Calculate distance markers (start, middle, end)
+    const markers = [
+      { distance: 0, label: "0" },
+      { distance: totalDistance / 2, label: (totalDistance / 2000).toFixed(1) },
+      { distance: totalDistance, label: (totalDistance / 1000).toFixed(1) },
+    ];
+
+    return {
+      minElevation: minElev,
+      maxElevation: maxElev,
+      elevationRange: elevRange,
+      pathData: path,
+      filledPath: filled,
+      distanceMarkers: markers,
+      bottomY: padding.top + chartHeight
+    };
+  }, [elevationData, totalDistance, chartWidth, chartHeight, padding.left, padding.top]);
+
+  // Scale functions for SVG rendering
   const scaleX = (distance: number) =>
     padding.left + (distance / totalDistance) * chartWidth;
   const scaleY = (elevation: number) =>
     padding.top + chartHeight - ((elevation - minElevation) / elevationRange) * chartHeight;
-
-  // Generate path
-  const pathData = elevationData
-    .map((point, index) => {
-      const x = scaleX(point.distance);
-      const y = scaleY(point.elevation);
-      return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
-    })
-    .join(" ");
-
-  // Close the path to create filled area
-  const firstX = scaleX(elevationData[0].distance);
-  const lastX = scaleX(elevationData[elevationData.length - 1].distance);
-  const bottomY = padding.top + chartHeight;
-  const filledPath = `${pathData} L ${lastX} ${bottomY} L ${firstX} ${bottomY} Z`;
-
-  // Calculate distance markers (start, middle, end)
-  const distanceMarkers = [
-    { distance: 0, label: "0" },
-    { distance: totalDistance / 2, label: (totalDistance / 2000).toFixed(1) },
-    { distance: totalDistance, label: (totalDistance / 1000).toFixed(1) },
-  ];
 
   return (
     <View style={styles.container}>
@@ -133,4 +156,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ElevationProfile;
+export default React.memo(ElevationProfile);

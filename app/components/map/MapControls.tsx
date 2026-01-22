@@ -1,4 +1,8 @@
-import type React from "react";
+/**
+ * Map controls component for toggling full screen and getting directions
+ */
+
+import React from "react";
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { Maximize2, ChevronDown, Navigation } from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
@@ -140,4 +144,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MapControls;
+export default React.memo(MapControls);

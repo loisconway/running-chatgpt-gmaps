@@ -19,7 +19,7 @@
 import { useEffect, useState, useRef } from "react";
 import { View, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import { REACT_APP_MAP_ID } from "@env";
+import { REACT_APP_MAP_ID } from "@/environmentVariables";
 
 // Define types for Google Maps objects
 declare global {
