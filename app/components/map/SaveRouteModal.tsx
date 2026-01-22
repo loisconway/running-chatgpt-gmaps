@@ -2,8 +2,6 @@
  * Modal component to save a route with a custom name
  */
 
-"use client";
-
 import type React from "react";
 import { useState } from "react";
 import {

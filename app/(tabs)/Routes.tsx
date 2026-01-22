@@ -2,7 +2,6 @@
  * Screen to explore saved routes with options to view or delete them
  */
 
-"use client";
 import {
   StyleSheet,
   FlatList,

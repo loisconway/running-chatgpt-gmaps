@@ -3,8 +3,6 @@
  * Currently only native platform (IOS) is working as expected. Fixing the web version is in the backlog.
  */
 
-"use client";
-
 import type React from "react";
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { View, StyleSheet, Platform, SafeAreaView, Alert, TouchableOpacity } from "react-native";
