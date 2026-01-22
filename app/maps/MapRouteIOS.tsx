@@ -43,7 +43,7 @@ const MapIOS: React.FC<MapProps> = ({
       <MapView
         ref={mapRef}
         style={styles.map}
-        // showsUserLocation
+        showsUserLocation // Disable when recording demo!
         showsMyLocationButton
         showsCompass
         onPress={(e) => {
