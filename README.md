@@ -26,6 +26,7 @@ https://github.com/user-attachments/assets/d7281bf7-0b49-4345-8598-f4492d2dc8e1
 - Extending route beyond quickest (like I am doing in my Next-js app), so you set a few points but you want it to be longer. I'm not sure yet if this is something I will try to tackle with AI.
 - UX needs a bit of a refresh, it isn't the prettiest map and generally think the map should take up more space, and the action buttons should just live on top of the map.
 - Backend implementation to develop those skills
+- Proper error logging rather than just console logging
 
 
 
@@ -33,6 +34,7 @@ https://github.com/user-attachments/assets/d7281bf7-0b49-4345-8598-f4492d2dc8e1
 I have an identified issue with trying to import react-native internals not supported on web. However, my current focus is for this app is mobile development so fixing the app in web is a later priority compared to adding new features.
 
 # To Do (Tech Debt Backlog)
+- Delete commented/dead code, I keep it around for a bit while I am working on it in case I want to reference it
 - Look at different mapping options, the gmaps api is a bit tricky sometimes and it can be confusing what is behind a paywall and what is not
 - Fix web app 
 - Deploy app to web (once fixed), Testflight for IOS, and Android -> I am an apple user so Android deployment is less of a priority personally but will be on the list
