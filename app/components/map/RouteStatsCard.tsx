@@ -2,8 +2,7 @@
  * Component to display route statistics in a compact or expanded card
  */
 
-import type React from "react";
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { Clock, Mountain, Route, X } from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
@@ -211,4 +210,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RouteStatsCard;
+export default React.memo(RouteStatsCard);

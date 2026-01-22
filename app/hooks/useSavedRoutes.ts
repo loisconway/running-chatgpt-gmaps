@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Alert } from "react-native";
 import saveRoute, {
   getSavedRoutes,
@@ -18,7 +18,7 @@ const useSavedRoutes = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
-  const loadSavedRoutes = async () => {
+  const loadSavedRoutes = useCallback(async () => {
     try {
       setLoading(true);
       const routes = await getSavedRoutes();
@@ -31,38 +31,38 @@ const useSavedRoutes = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     setRefreshing(true);
     loadSavedRoutes();
-  };
+  }, [loadSavedRoutes]);
 
-  const handleDeleteRoute = async (routeId: string) => {
+  const handleDeleteRoute = useCallback(async (routeId: string) => {
     try {
       await deleteRoute(routeId);
-      setSavedRoutes(savedRoutes.filter((route) => route.id !== routeId));
+      setSavedRoutes((prevRoutes) => prevRoutes.filter((route) => route.id !== routeId));
       setSavedRoutesCount((prev) => prev - 1);
     } catch (error) {
       console.error("Error deleting route:", error);
       Alert.alert("Error", "Failed to delete route");
     }
-  };
+  }, []);
 
-  const handleSaveRoute = async (
+  const handleSaveRoute = useCallback(async (
     routeData: Omit<SavedRoute, "id" | "createdAt">
   ) => {
     try {
       const newRoute = await saveRoute(routeData);
-      setSavedRoutes([newRoute, ...savedRoutes.slice(0, 4)]); // Keep only 5 routes
-      setSavedRoutesCount(Math.min(savedRoutesCount + 1, 5));
+      setSavedRoutes((prevRoutes) => [newRoute, ...prevRoutes.slice(0, 4)]); // Keep only 5 routes
+      setSavedRoutesCount((prev) => Math.min(prev + 1, 5));
       return true;
     } catch (error) {
       console.error("Error saving route:", error);
       Alert.alert("Error", "Failed to save route. Please try again.");
       return false;
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadSavedRoutes();

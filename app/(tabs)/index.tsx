@@ -4,14 +4,16 @@
 
 import type React from "react"
 import { StyleSheet } from "react-native"
-import { useRoute } from "@react-navigation/native"
+import { useLocalSearchParams } from "expo-router"
 import MapRoute from "../maps/MapRoute"
 import { ThemedView } from "@/components/ThemedView"
 import type { SavedRoute } from "../services/routeStorage"
 
 const HomeScreen: React.FC = () => {
-  const route= useRoute()
-  const savedRoute = route.params?.savedRoute as SavedRoute | undefined
+  const params = useLocalSearchParams()
+  const savedRoute = params.savedRoute 
+    ? (JSON.parse(params.savedRoute as string) as SavedRoute)
+    : undefined
 
   return (
     <ThemedView style={styles.container}>

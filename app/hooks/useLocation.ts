@@ -2,7 +2,7 @@
 /**
  * Custom hook to get the user's current location using Expo Location API.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import * as Location from "expo-location";
 import { Alert, Platform } from "react-native";
 import React from "react";
@@ -20,7 +20,7 @@ const useLocation = () => {
   );
   const [loading, setLoading] = useState<boolean>(false);
 
-  const requestLocationPermission = async () => {
+  const requestLocationPermission = useCallback(async () => {
     if (Platform.OS === "web") {
       // Browser-based location handling
       return new Promise<boolean>((resolve) => {
@@ -53,9 +53,9 @@ const useLocation = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const getCurrentLocation = async () => {
+  const getCurrentLocation = useCallback(async () => {
     setLoading(true);
     try {
       if (Platform.OS === "web") {
@@ -115,11 +115,11 @@ const useLocation = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [requestLocationPermission]);
 
   useEffect(() => {
     getCurrentLocation();
-  }, []);
+  }, [getCurrentLocation]);
 
   return {
     currentLocation,

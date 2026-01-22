@@ -11,7 +11,7 @@ import {
   SafeAreaView,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import useSavedRoutes from "../hooks/useSavedRoutes";
@@ -22,12 +22,13 @@ import type { SavedRoute } from "../services/routeStorage";
 export default function ExploreScreen() {
   const { savedRoutes, loading, refreshing, handleRefresh, handleDeleteRoute } =
     useSavedRoutes();
-  const navigation = useNavigation();
+  const router = useRouter();
 
   const handleViewRoute = (route: SavedRoute) => {
     // Navigate to the home tab and pass the route data
-    navigation.navigate("index", {
-      savedRoute: route,
+    router.push({
+      pathname: "/(tabs)",
+      params: { savedRoute: JSON.stringify(route) },
     });
   };
 

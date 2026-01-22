@@ -2,7 +2,7 @@
  * Component for inputting origin and destination locations on the map
  */
 
-import type React from "react";
+import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { TouchableOpacity, ActivityIndicator } from "react-native";
 import { MapPin } from "lucide-react-native";
@@ -13,9 +13,9 @@ import GooglePlacesInput from "@/app/maps/GooglePlacesInput";
 
 interface LocationInputsProps {
   origin: LocationType | null;
-  setOrigin: React.Dispatch<React.SetStateAction<LocationType | null>>;
+  setOrigin: (location: LocationType | null) => void;
   destination: LocationType | null;
-  setDestination: React.Dispatch<React.SetStateAction<LocationType | null>>;
+  setDestination: (location: LocationType | null) => void;
   onGetDirections: () => void;
   onReset: () => void;
   loading: boolean;
@@ -235,4 +235,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationInputs;
+export default React.memo(LocationInputs);

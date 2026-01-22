@@ -18,6 +18,9 @@ The app would then use AI to generate plot points for a map and generate the rou
 - adding waypoints along the route to change it 
 - Extending route beyond quickest (like I am doing in my Next-js app)
 - UX needs a bit of a refresh, it isn't the prettiest map and generally think the map should take up more space, and the action buttons should just live on top of the map.
+- Error Boundaries 
+- Backend implementation to develop those skills
+
 
 
 ## Woops I broke this app in web

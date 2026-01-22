@@ -4,11 +4,12 @@
 
 "use client";
 
-import { useState } from "react";
+import { useReducer, useCallback } from "react";
 import { Alert } from "react-native";
 import { REACT_APP_GOOGLE_MAPS_API_KEY } from "@env";
 import { decodePolyline } from "../utils/mapUtils";
 import type { LocationType } from "./useLocation";
+import type { SavedRoute } from "../services/routeStorage";
 
 const apiKey = REACT_APP_GOOGLE_MAPS_API_KEY;
 
@@ -45,21 +46,134 @@ type RouteStats = {
   totalDistanceMeters?: number;
 };
 
+// Define state structure
+type RouteState = {
+  origin: LocationType | null;
+  destination: LocationType | null;
+  waypoints: LocationType[];
+  route: LocationType[];
+  encodedPolyline: string;
+  loading: boolean;
+  routeDistance: string;
+  routeStats: RouteStats;
+  pace: number;
+};
+
+// Define action types
+type RouteAction =
+  | { type: 'SET_ORIGIN'; payload: LocationType | null }
+  | { type: 'SET_DESTINATION'; payload: LocationType | null }
+  | { type: 'SET_WAYPOINTS'; payload: LocationType[] }
+  | { type: 'ADD_WAYPOINT'; payload: LocationType }
+  | { type: 'REMOVE_WAYPOINT'; payload: number }
+  | { type: 'SET_ROUTE'; payload: LocationType[] }
+  | { type: 'SET_ENCODED_POLYLINE'; payload: string }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ROUTE_DISTANCE'; payload: string }
+  | { type: 'SET_ROUTE_STATS'; payload: RouteStats }
+  | { type: 'SET_PACE'; payload: number }
+  | { type: 'RESET_ROUTE' }
+  | { type: 'LOAD_SAVED_ROUTE'; payload: SavedRoute };
+
+// Initial state
+const initialState: RouteState = {
+  origin: null,
+  destination: null,
+  waypoints: [],
+  route: [],
+  encodedPolyline: "",
+  loading: false,
+  routeDistance: "",
+  routeStats: { distance: "" },
+  pace: 6, // min/km, default 6:00 min/km
+};
+
+// Reducer function
+function routeReducer(state: RouteState, action: RouteAction): RouteState {
+  switch (action.type) {
+    case 'SET_ORIGIN':
+      return { ...state, origin: action.payload };
+    case 'SET_DESTINATION':
+      return { ...state, destination: action.payload };
+    case 'SET_WAYPOINTS':
+      return { ...state, waypoints: action.payload };
+    case 'ADD_WAYPOINT':
+      return { ...state, waypoints: [...state.waypoints, action.payload] };
+    case 'REMOVE_WAYPOINT':
+      return { 
+        ...state, 
+        waypoints: state.waypoints.filter((_, i) => i !== action.payload) 
+      };
+    case 'SET_ROUTE':
+      return { ...state, route: action.payload };
+    case 'SET_ENCODED_POLYLINE':
+      return { ...state, encodedPolyline: action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_ROUTE_DISTANCE':
+      return { ...state, routeDistance: action.payload };
+    case 'SET_ROUTE_STATS':
+      return { ...state, routeStats: action.payload };
+    case 'SET_PACE':
+      return { ...state, pace: action.payload };
+    case 'RESET_ROUTE':
+      return {
+        ...state,
+        origin: null,
+        destination: null,
+        waypoints: [],
+        route: [],
+        encodedPolyline: "",
+        routeDistance: "",
+        routeStats: { distance: "" },
+      };
+    case 'LOAD_SAVED_ROUTE':
+      const savedRoute = action.payload;
+      return {
+        ...state,
+        origin: savedRoute.originPlaceId && savedRoute.originName ? {
+          placeId: savedRoute.originPlaceId,
+          name: savedRoute.originName,
+          latitude: savedRoute.originLocation.latitude,
+          longitude: savedRoute.originLocation.longitude,
+        } : state.origin,
+        destination: savedRoute.destinationPlaceId && savedRoute.destinationName ? {
+          placeId: savedRoute.destinationPlaceId,
+          name: savedRoute.destinationName,
+          latitude: savedRoute.destinationLocation.latitude,
+          longitude: savedRoute.destinationLocation.longitude,
+        } : state.destination,
+        waypoints: savedRoute.waypoints && Array.isArray(savedRoute.waypoints) 
+          ? savedRoute.waypoints.map((wp: any) => ({
+              placeId: wp.placeId,
+              name: wp.name,
+              latitude: wp.latitude,
+              longitude: wp.longitude,
+            }))
+          : state.waypoints,
+        pace: savedRoute.pace || state.pace,
+        encodedPolyline: savedRoute.polyline || state.encodedPolyline,
+        route: savedRoute.polyline ? decodePolyline(savedRoute.polyline) : state.route,
+        routeDistance: savedRoute.distance || state.routeDistance,
+        routeStats: savedRoute.distance ? {
+          distance: savedRoute.distance,
+          elevation: savedRoute.elevation,
+          estimatedTime: savedRoute.estimatedTime,
+          pace: savedRoute.pace,
+        } : state.routeStats,
+      };
+    default:
+      return state;
+  }
+}
+
 const useRoutes = () => {
-  const [origin, setOrigin] = useState<LocationType | null>(null);
-  const [destination, setDestination] = useState<LocationType | null>(null);
-  const [waypoints, setWaypoints] = useState<LocationType[]>([]);
-  const [route, setRoute] = useState<LocationType[]>([]);
-  const [encodedPolyline, setEncodedPolyline] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [routeDistance, setRouteDistance] = useState<string>("");
-  const [routeStats, setRouteStats] = useState<RouteStats>({ distance: "" });
-  const [pace, setPace] = useState<number>(6); // min/km, default 6:00 min/km
+  const [state, dispatch] = useReducer(routeReducer, initialState);
 
   // Calculate estimated time based on distance and pace (min/km)
-  const calculateEstimatedTime = (distanceMeters: number): string => {
+  const calculateEstimatedTime = useCallback((distanceMeters: number): string => {
     const distanceKm = distanceMeters / 1000;
-    const minutes = Math.round(distanceKm * pace);
+    const minutes = Math.round(distanceKm * state.pace);
     
     if (minutes < 60) {
       return `${minutes}m`;
@@ -68,7 +182,7 @@ const useRoutes = () => {
       const m = minutes % 60;
       return `${h}h ${m}m`;
     }
-  };
+  }, [state.pace]);
 
   // Calculate elevation gain from decoded polyline using Google Elevation API
   const calculateElevationGain = async (
@@ -132,12 +246,12 @@ const useRoutes = () => {
   };
 
   // Check if a placeId is actually coordinates (contains comma)
-  const isCoordinateLocation = (placeId: string | undefined): boolean => {
+  const isCoordinateLocation = useCallback((placeId: string | undefined): boolean => {
     return placeId?.includes(",") ?? false;
-  };
+  }, []);
 
   // Build location object for API request - handles both placeId and coordinates
-  const buildLocationObject = (
+  const buildLocationObject = useCallback((
     location: LocationType
   ): { placeId?: string; location?: { latLng: { latitude: number; longitude: number } } } => {
     if (isCoordinateLocation(location.placeId)) {
@@ -156,10 +270,10 @@ const useRoutes = () => {
         placeId: location.placeId,
       };
     }
-  };
+  }, [isCoordinateLocation]);
 
-  const requestRoute = async () => {
-    if (!origin?.placeId || !destination?.placeId) {
+  const requestRoute = useCallback(async () => {
+    if (!state.origin?.placeId || !state.destination?.placeId) {
       Alert.alert(
         "Missing Information",
         "Please set both origin and destination locations."
@@ -167,17 +281,17 @@ const useRoutes = () => {
       return null;
     }
 
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const reqBody: any = {
-        origin: buildLocationObject(origin),
-        destination: buildLocationObject(destination),
+        origin: buildLocationObject(state.origin),
+        destination: buildLocationObject(state.destination),
         travelMode: "WALK", // Set travel mode to walking
       };
 
       // Add waypoints if they exist
-      if (waypoints.length > 0) {
-        reqBody.intermediates = waypoints.map((waypoint) => buildLocationObject(waypoint));
+      if (state.waypoints.length > 0) {
+        reqBody.intermediates = state.waypoints.map((waypoint) => buildLocationObject(waypoint));
       }
 
       console.log("Request Body:", JSON.stringify(reqBody, null, 2));
@@ -210,19 +324,19 @@ const useRoutes = () => {
 
       if (data.routes && data.routes.length > 0) {
         const polyline = data.routes[0].polyline.encodedPolyline;
-        setEncodedPolyline(polyline);
+        dispatch({ type: 'SET_ENCODED_POLYLINE', payload: polyline });
         const decodedPath = decodePolyline(polyline);
-        setRoute(decodedPath);
+        dispatch({ type: 'SET_ROUTE', payload: decodedPath });
 
         // Extract and set distance information - sum all legs for total distance
+        let distanceString = "";
+        
         if (data.routes[0].legs && data.routes[0].legs.length > 0) {
           // Sum distance across all legs (origin -> waypoint(s) -> destination)
           const totalDistanceInMeters = data.routes[0].legs.reduce(
             (sum, leg) => sum + (leg.distanceMeters || 0),
             0
           );
-          
-          let distanceString = "";
           
           if (totalDistanceInMeters < 1000) {
             distanceString = `${totalDistanceInMeters} m`;
@@ -231,7 +345,7 @@ const useRoutes = () => {
             distanceString = `${distanceInKm} km`;
           }
           
-          setRouteDistance(distanceString);
+          dispatch({ type: 'SET_ROUTE_DISTANCE', payload: distanceString });
 
           // Calculate additional stats using total distance
           const estimatedTime = calculateEstimatedTime(totalDistanceInMeters);
@@ -240,20 +354,23 @@ const useRoutes = () => {
             totalDistanceInMeters
           );
 
-          setRouteStats({
-            distance: distanceString,
-            estimatedTime,
-            elevation,
-            pace,
-            elevationProfile,
-            totalDistanceMeters: totalDistanceInMeters,
+          dispatch({ 
+            type: 'SET_ROUTE_STATS', 
+            payload: {
+              distance: distanceString,
+              estimatedTime,
+              elevation,
+              pace: state.pace,
+              elevationProfile,
+              totalDistanceMeters: totalDistanceInMeters,
+            }
           });
         }
 
         return {
           route: decodedPath,
           polyline,
-          distance: routeDistance,
+          distance: distanceString,
         };
       } else {
         console.log("No routes in response. Full data:", data);
@@ -271,91 +388,46 @@ const useRoutes = () => {
       );
       return null;
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
-  };
+  }, [state.origin, state.destination, state.waypoints, state.pace, buildLocationObject, calculateEstimatedTime]);
 
-  const resetRoute = () => {
-    setOrigin(null);
-    setDestination(null);
-    setWaypoints([]);
-    setRoute([]);
-    setEncodedPolyline("");
-    setRouteDistance("");
-    setRouteStats({ distance: "" });
-  };
+  const resetRoute = useCallback(() => {
+    dispatch({ type: 'RESET_ROUTE' });
+  }, []);
 
-  const loadSavedRoute = (savedRoute: any) => {
-    // Set origin and destination
-    if (savedRoute.originPlaceId && savedRoute.originName) {
-      setOrigin({
-        placeId: savedRoute.originPlaceId,
-        name: savedRoute.originName,
-        latitude: savedRoute.originLocation.latitude,
-        longitude: savedRoute.originLocation.longitude,
-      });
-    }
-
-    if (savedRoute.destinationPlaceId && savedRoute.destinationName) {
-      setDestination({
-        placeId: savedRoute.destinationPlaceId,
-        name: savedRoute.destinationName,
-        latitude: savedRoute.destinationLocation.latitude,
-        longitude: savedRoute.destinationLocation.longitude,
-      });
-    }
-
-    // Load waypoints if they exist
-    if (savedRoute.waypoints && Array.isArray(savedRoute.waypoints)) {
-      setWaypoints(savedRoute.waypoints.map((wp: any) => ({
-        placeId: wp.placeId,
-        name: wp.name,
-        latitude: wp.latitude,
-        longitude: wp.longitude,
-      })));
-    }
-
-    // Set pace if available
-    if (savedRoute.pace) {
-      setPace(savedRoute.pace);
-    }
-
-    // Set the polyline and decode it
-    if (savedRoute.polyline) {
-      setEncodedPolyline(savedRoute.polyline);
-      const decodedPath = decodePolyline(savedRoute.polyline);
-      setRoute(decodedPath);
-
-      // Set full route stats if available
-      if (savedRoute.distance) {
-        setRouteDistance(savedRoute.distance);
-        setRouteStats({
-          distance: savedRoute.distance,
-          elevation: savedRoute.elevation,
-          estimatedTime: savedRoute.estimatedTime,
-          pace: savedRoute.pace,
-          // Note: elevationProfile is not saved to reduce storage size
-        });
-      }
-    }
-  };
+  const loadSavedRoute = useCallback((savedRoute: SavedRoute) => {
+    dispatch({ type: 'LOAD_SAVED_ROUTE', payload: savedRoute });
+  }, []);
 
   return {
-    origin,
-    setOrigin,
-    destination,
-    setDestination,
-    waypoints,
-    setWaypoints,
-    addWaypoint: (waypoint: LocationType) => setWaypoints((prevWaypoints) => [...prevWaypoints, waypoint]),
-    removeWaypoint: (index: number) => setWaypoints((prevWaypoints) => prevWaypoints.filter((_, i) => i !== index)),
-    route,
-    encodedPolyline,
-    loading,
-    routeDistance,
-    routeStats,
-    pace,
-    setPace,
+    origin: state.origin,
+    setOrigin: useCallback((location: LocationType | null) => {
+      dispatch({ type: 'SET_ORIGIN', payload: location });
+    }, []),
+    destination: state.destination,
+    setDestination: useCallback((location: LocationType | null) => {
+      dispatch({ type: 'SET_DESTINATION', payload: location });
+    }, []),
+    waypoints: state.waypoints,
+    setWaypoints: useCallback((waypoints: LocationType[]) => {
+      dispatch({ type: 'SET_WAYPOINTS', payload: waypoints });
+    }, []),
+    addWaypoint: useCallback((waypoint: LocationType) => {
+      dispatch({ type: 'ADD_WAYPOINT', payload: waypoint });
+    }, []),
+    removeWaypoint: useCallback((index: number) => {
+      dispatch({ type: 'REMOVE_WAYPOINT', payload: index });
+    }, []),
+    route: state.route,
+    encodedPolyline: state.encodedPolyline,
+    loading: state.loading,
+    routeDistance: state.routeDistance,
+    routeStats: state.routeStats,
+    pace: state.pace,
+    setPace: useCallback((pace: number) => {
+      dispatch({ type: 'SET_PACE', payload: pace });
+    }, []),
     requestRoute,
     resetRoute,
     loadSavedRoute,

@@ -2,7 +2,7 @@
  * Component to display a card for a saved route with options to view or delete
  */
 
-import type React from "react";
+import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Navigation, Trash2 } from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
@@ -190,4 +190,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RouteCard;
+export default React.memo(RouteCard);
