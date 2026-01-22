@@ -1,3 +1,7 @@
+/**
+ * Custom hook to manage saved routes using local storage
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";

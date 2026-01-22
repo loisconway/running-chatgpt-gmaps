@@ -1,3 +1,7 @@
+/**
+ * Modal component for setting running pace in minutes per kilometer
+ */
+
 import type React from "react";
 import { useState, useEffect } from "react";
 import {

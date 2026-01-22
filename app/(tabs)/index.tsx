@@ -1,3 +1,7 @@
+/**
+ * Home screen component displaying the map and route
+ */
+
 import type React from "react"
 import { StyleSheet } from "react-native"
 import { useRoute } from "@react-navigation/native"
@@ -6,7 +10,7 @@ import { ThemedView } from "@/components/ThemedView"
 import type { SavedRoute } from "../services/routeStorage"
 
 const HomeScreen: React.FC = () => {
-  const route = useRoute()
+  const route= useRoute()
   const savedRoute = route.params?.savedRoute as SavedRoute | undefined
 
   return (

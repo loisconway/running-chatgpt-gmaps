@@ -1,3 +1,7 @@
+/**
+ * Map controls component for toggling full screen and getting directions
+ */
+
 import type React from "react";
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { Maximize2, ChevronDown, Navigation } from "lucide-react-native";

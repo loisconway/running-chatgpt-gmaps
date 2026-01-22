@@ -1,8 +1,12 @@
+/**
+ * Custom hook to manage route calculations using Google Maps API
+ */
+
 "use client";
 
 import { useState } from "react";
 import { Alert } from "react-native";
-import { REACT_APP_GOOGLE_MAPS_API_KEY } from "@/environmentVariables";
+import { REACT_APP_GOOGLE_MAPS_API_KEY } from "@env";
 import { decodePolyline } from "../utils/mapUtils";
 import type { LocationType } from "./useLocation";
 
@@ -176,7 +180,7 @@ const useRoutes = () => {
         reqBody.intermediates = waypoints.map((waypoint) => buildLocationObject(waypoint));
       }
 
-      console.log("🚀 Request Body:", JSON.stringify(reqBody, null, 2));
+      console.log("Request Body:", JSON.stringify(reqBody, null, 2));
 
       const response = await fetch(
         "https://routes.googleapis.com/directions/v2:computeRoutes",
@@ -192,11 +196,11 @@ const useRoutes = () => {
       );
 
       const data: RouteResponse = await response.json();
-      console.log("📡 API Response:", JSON.stringify(data, null, 2));
+      console.log(" API Response:", JSON.stringify(data, null, 2));
 
       // Check for API errors
       if ((data as any).error) {
-        console.error("❌ API Error:", (data as any).error);
+        console.error("API Error:", (data as any).error);
         Alert.alert(
           "Route Error",
           `${(data as any).error.message || "Failed to calculate route"}`
@@ -252,7 +256,7 @@ const useRoutes = () => {
           distance: routeDistance,
         };
       } else {
-        console.log("❌ No routes in response. Full data:", data);
+        console.log("No routes in response. Full data:", data);
         Alert.alert(
           "Route Not Found",
           "No walking route could be found between these locations. Please try different locations."
@@ -260,7 +264,7 @@ const useRoutes = () => {
         return null;
       }
     } catch (error) {
-      console.error("🔥 Error:", error);
+      console.error("Error:", error);
       Alert.alert(
         "Network Error",
         "Failed to fetch walking route. Please check your internet connection and try again."
@@ -331,7 +335,6 @@ const useRoutes = () => {
           estimatedTime: savedRoute.estimatedTime,
           pace: savedRoute.pace,
           // Note: elevationProfile is not saved to reduce storage size
-          // It will be recalculated if needed
         });
       }
     }

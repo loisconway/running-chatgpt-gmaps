@@ -1,3 +1,7 @@
+/**
+ * Component to display an elevation profile chart using SVG
+ */
+
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import Svg, { Path, Line, Text as SvgText } from "react-native-svg";

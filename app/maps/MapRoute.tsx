@@ -1,3 +1,8 @@
+/**
+ * Main map route component handling map display, route calculation, and user interactions.
+ * Currently only native platform (IOS) is working as expected. Fixing the web version is in the backlog.
+ */
+
 "use client";
 
 import type React from "react";
@@ -146,81 +151,101 @@ const MapRoute: React.FC<MapRouteProps> = ({ savedRoute }) => {
     // Route drawing mode logic
     if (routeDrawingMode) {
       if (!origin) {
-        // First point: set as origin immediately
-        const newOrigin = {
-          name: placeholderName,
+        // First point: show loading, then set with actual address
+        const tempOrigin = {
+          name: "Loading address...",
           placeId: coordsString,
           latitude,
           longitude,
         };
-        setOrigin(newOrigin);
-        // Update name asynchronously
+        setOrigin(tempOrigin);
+        // Get address and update
         reverseGeocode(latitude, longitude)
           .then(placeName => {
-            setOrigin(prev => prev ? {...prev, name: placeName} : prev);
+            setOrigin({ ...tempOrigin, name: placeName });
+          })
+          .catch(error => {
+            console.error('Error geocoding origin:', error);
+            setOrigin({ ...tempOrigin, name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` });
           });
       } else if (!destination) {
-        // Second point: set as destination immediately
-        const newDest = {
-          name: placeholderName,
+        // Second point: show loading, then set with actual address
+        const tempDest = {
+          name: "Loading address...",
           placeId: coordsString,
           latitude,
           longitude,
         };
-        setDestination(newDest);
-        // Update name asynchronously
+        setDestination(tempDest);
+        // Get address and update
         reverseGeocode(latitude, longitude)
           .then(placeName => {
-            setDestination(prev => prev ? {...prev, name: placeName} : prev);
+            setDestination({ ...tempDest, name: placeName });
+          })
+          .catch(error => {
+            console.error('Error geocoding destination:', error);
+            setDestination({ ...tempDest, name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` });
           });
       } else {
         // Third+ point: convert current destination to waypoint, set new point as destination
         addWaypoint(destination);
-        const newDest = {
-          name: placeholderName,
+        const tempDest = {
+          name: "Loading address...",
           placeId: coordsString,
           latitude,
           longitude,
         };
-        setDestination(newDest);
-        // Update name asynchronously
+        setDestination(tempDest);
+        // Get address and update
         reverseGeocode(latitude, longitude)
           .then(placeName => {
-            setDestination(prev => prev ? {...prev, name: placeName} : prev);
+            setDestination({ ...tempDest, name: placeName });
           })
+          .catch(error => {
+            console.error('Error geocoding destination:', error);
+            setDestination({ ...tempDest, name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` });
+          });
       }
       return;
     }
 
     // Normal mode logic
     if (mapTapMode === "origin") {
-      const newOrigin = {
-        name: placeholderName,
+      const tempOrigin = {
+        name: "Loading address...",
         placeId: coordsString,
         latitude,
         longitude,
       };
-      setOrigin(newOrigin);
+      setOrigin(tempOrigin);
       setMapTapMode(null);
-      // Update name asynchronously
+      // Get address and update
       reverseGeocode(latitude, longitude)
         .then(placeName => {
-          setOrigin(prev => prev ? {...prev, name: placeName} : prev);
+          setOrigin({ ...tempOrigin, name: placeName });
         })
+        .catch(error => {
+          console.error('Error geocoding origin:', error);
+          setOrigin({ ...tempOrigin, name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` });
+        });
     } else if (mapTapMode === "destination") {
-      const newDest = {
-        name: placeholderName,
+      const tempDest = {
+        name: "Loading address...",
         placeId: coordsString,
         latitude,
         longitude,
       };
-      setDestination(newDest);
+      setDestination(tempDest);
       setMapTapMode(null);
-      // Update name asynchronously
+      // Get address and update
       reverseGeocode(latitude, longitude)
         .then(placeName => {
-          setDestination(prev => prev ? {...prev, name: placeName} : prev);
+          setDestination({ ...tempDest, name: placeName });
         })
+        .catch(error => {
+          console.error('Error geocoding destination:', error);
+          setDestination({ ...tempDest, name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` });
+        });
     }
   };
 

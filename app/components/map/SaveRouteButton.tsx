@@ -1,3 +1,7 @@
+/**
+ * Button component to save the current route
+ */
+
 import type React from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import { Save } from "lucide-react-native";

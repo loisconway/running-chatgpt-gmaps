@@ -1,3 +1,7 @@
+/**
+ * Component for inputting origin and destination locations on the map
+ */
+
 import type React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { TouchableOpacity, ActivityIndicator } from "react-native";

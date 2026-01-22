@@ -1,3 +1,10 @@
+/**
+ * Web-specific map component using Google Maps JavaScript API
+ * Currently, this component is not fully functional and requires further development.
+ * Fixing this is in the backlog.
+ * My main focus is on the native (iOS) version for now.
+ */
+
 import React, { useEffect, useRef } from "react";
 
 declare global {

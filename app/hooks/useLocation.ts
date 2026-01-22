@@ -1,5 +1,7 @@
 "use client";
-
+/**
+ * Custom hook to get the user's current location using Expo Location API.
+ */
 import { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import { Alert, Platform } from "react-native";

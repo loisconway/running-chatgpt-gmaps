@@ -1,10 +1,21 @@
+/**
+ * Originally this component was for the google maps autocomplete input field
+ * However, due to issues with Google Places API billing changes, this isn't working right now.
+ * Leaving commented for now for reference, but I plan to move more towards the AI input or clicking on the map
+ * which I think is a more intuitive user experience.
+ * 
+ * This component is for the input fields
+ */
+
+
 import type React from "react";
 import { useEffect, useRef } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import type { GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
-import { REACT_APP_GOOGLE_MAPS_API_KEY } from "@/environmentVariables";
+import { REACT_APP_GOOGLE_MAPS_API_KEY } from "@env";
 import { View, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
+
 
 const apiKey = REACT_APP_GOOGLE_MAPS_API_KEY;
 
