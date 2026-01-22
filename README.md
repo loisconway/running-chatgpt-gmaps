@@ -20,38 +20,28 @@ https://github.com/user-attachments/assets/d7281bf7-0b49-4345-8598-f4492d2dc8e1
 ## To-Do
 - AI implementation 
 - How I plan to match up AI to maps
-- adding waypoints along the route to change it 
-- Extending route beyond quickest (like I am doing in my Next-js app)
+- Being able to change waypoints not just add or delete them
+- Extending route beyond quickest (like I am doing in my Next-js app), so you set a few points but you want it to be longer. I'm not sure yet if this is something I will try to tackle with AI.
 - UX needs a bit of a refresh, it isn't the prettiest map and generally think the map should take up more space, and the action buttons should just live on top of the map.
 
 
-## Woops I broke this app in web
-I think the gmaps api updated and I lost some features: autocomplete stopped working on my inputs but I might remove this feature as I try to go more towards AI powered inputs. I also have an issue with trying to import react-native internals not supported on web. I need to make sure to separate concerns if I have web vs mobile. However, my current focus is for this app is mobile development so fixing the app in web is a later priority compared to adding new features.
+## Woops I broke this app in web and Google Maps Autocomplete
+I think the gmaps api updated and I lost some features: autocomplete stopped working on my inputs but I removed this feature as soon I will try to go more towards AI powered inputs anyway. I also have an issue with trying to import react-native internals not supported on web. I need to make sure to separate concerns if I have web vs mobile. However, my current focus is for this app is mobile development so fixing the app in web is a later priority compared to adding new features.
+
+# To Do
+- Add a simple AI implementation simply looks for start and end points in a NL user input and transforms these to maps
+- Look at different mapping options, the gmaps api is a bit tricky sometimes
+- Fix web app
 
 # To Do
 - Fix or remove GooglePlacesAutocomplete 
 - Add a simple AI implementation simply looks for start and end points in a NL user input and transforms these to maps
 - Look at different mapping options, the gmaps api is a bit tricky sometimes
+- Deploy app
 
-
-# Welcome to your Expo app 👋
-
-## To-Do
-- AI implementation 
-- How I plan to match up AI to maps
-- adding waypoints along the route to change it 
-- Extending route beyond quickest (like I am doing in my Next-js app)
-- UX needs a bit of a refresh, it isn't the prettiest map and generally think the map should take up more space, and the action buttons should just live on top of the map.
-
-
-## Woops I broke this app in web
-I think the gmaps api updated and I lost some features: autocomplete stopped working on my inputs but I might remove this feature as I try to go more towards AI powered inputs. I also have an issue with trying to import react-native internals not supported on web. I need to make sure to separate concerns if I have web vs mobile. However, my current focus is for this app is mobile development so fixing the app in web is a later priority compared to adding new features.
-
-# To Do
-- Fix or remove GooglePlacesAutocomplete 
-- Add a simple AI implementation simply looks for start and end points in a NL user input and transforms these to maps
-- Look at different mapping options, the gmaps api is a bit tricky sometimes
-
+# Running the app 
+Running the app locally is pretty simple but you need a google maps api key (REACT_APP_GOOGLE_MAPS_API_KEY) in your .env 
+I looked into deployment but looked a little tricky with testflight etc for apple so just put that a bit further down the to do list while I develop more features.
 
 # Welcome to your Expo app 👋
 
@@ -62,7 +52,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 1. Install dependencies
 
    ```bash
-   npm install
+   yarn install
    ```
 
 2. Start the app
