@@ -26,9 +26,19 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-          <Text>Something went wrong</Text>
-          <Button 
-            title="Try Again" 
+          <Text style={{ fontSize: 18, marginBottom: 8 }}>
+            An unexpected error occurred.
+          </Text>
+          <Text style={{ marginBottom: 16 }}>
+            Please try again. If the problem continues, you may need to restart the app or contact support.
+          </Text>
+          {this.state.error && (
+            <Text style={{ fontSize: 12, color: 'gray', marginBottom: 16 }}>
+              Error details: {this.state.error.message}
+            </Text>
+          )}
+          <Button
+            title="Try Again"
             onPress={() => this.setState({ hasError: false })}
           />
         </View>
