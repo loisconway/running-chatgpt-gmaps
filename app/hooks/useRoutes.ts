@@ -2,8 +2,6 @@
  * Custom hook to manage route calculations using Google Maps API
  */
 
-"use client";
-
 import { useReducer, useCallback } from "react";
 import { Alert } from "react-native";
 import { REACT_APP_GOOGLE_MAPS_API_KEY } from "@env";

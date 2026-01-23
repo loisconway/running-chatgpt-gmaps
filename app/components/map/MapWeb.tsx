@@ -2,7 +2,6 @@
  * Web implementation of the Map component using Google Maps JavaScript API
  */
 
-"use client";
 
 import type React from "react";
 import { useEffect, useRef } from "react";

@@ -2,7 +2,6 @@
  * iOS specific map component using react-native-maps
  */
 
-"use client";
 
 import type React from "react";
 import { useEffect, useRef } from "react";
