@@ -1,4 +1,4 @@
-![Tests](https://github.com/loisconway/running-chatgpt-gmaps/actions/workflows/test.yml/badge.svg)
+![Tests](https://github.com/loisconway/expo-running-chatgpt-gmaps/actions/workflows/test.yml/badge.svg)
 
 
 # Route planning using AI

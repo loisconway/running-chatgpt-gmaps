@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "running-maps-chatgpt",
-    "slug": "running-maps-chatgpt",
+    "name": "expo-running-chatgpt-gmaps",
+    "slug": "expo-running-chatgpt-gmaps",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

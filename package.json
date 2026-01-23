@@ -1,5 +1,5 @@
 {
-  "name": "running-maps-chatgpt",
+  "name": "expo-running-chatgpt-gmaps",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "engines": {
