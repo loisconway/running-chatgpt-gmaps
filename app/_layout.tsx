@@ -12,6 +12,10 @@ import { useEffect } from 'react';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
+import { initSentry } from '@/app/utils/sentry';
+
+// Initialize Sentry for error tracking
+initSentry();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

@@ -25,6 +25,17 @@ jobs:
 
       - name: Run tests
         run: yarn test:ci
+      #TODO: Enable Sentry release creation once Sentry is set up properly
+      # - name: Create Sentry release
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: getsentry/action-release@v1
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      #     SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      #     SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      #   with:
+      #     environment: production
+      #     version: ${{ github.sha }}
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4

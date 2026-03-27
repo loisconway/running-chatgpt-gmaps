@@ -54,6 +54,13 @@ plugins: [
         "Allow this app to use your location to show routes near you.",
     },
   ],
+  [
+    "sentry-expo",
+    {
+      organization: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+    },
+  ],
 ],
 
     extra: {

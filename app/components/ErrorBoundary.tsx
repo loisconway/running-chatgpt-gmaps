@@ -1,11 +1,11 @@
 /**
  * ErrorBoundary component to catch and display errors in the app
- * TODO: Enhance with logging service integration, and a more user-friendly UI that matches the rest of the app
- * I also need to test this
+ * Integrates with Sentry for error tracking and monitoring
  */
 
 import React, { Component, ReactNode } from 'react';
 import { View, Text, Button } from 'react-native';
+import { Sentry } from '@/app/utils/sentry';
 
 interface Props {
   children: ReactNode;
@@ -25,7 +25,15 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error boundary caught:', error, errorInfo);
-    // TODO: Add some sort of logging service here
+    
+    // Send error to Sentry for tracking
+    Sentry.Native.captureException(error, {
+      contexts: {
+        react: {
+          componentStack: errorInfo.componentStack,
+        },
+      },
+    });
   }
 
   render() {
